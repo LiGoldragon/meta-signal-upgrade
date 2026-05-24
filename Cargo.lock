@@ -305,7 +305,7 @@ dependencies = [
 [[package]]
 name = "signal-upgrade"
 version = "0.1.0"
-source = "git+https://github.com/LiGoldragon/signal-upgrade.git?branch=main#0358be06a22e6411084c1bf785f44b339e357ebc"
+source = "git+https://github.com/LiGoldragon/signal-upgrade.git?branch=main#b5eb0e8eba94443dfb5398167f97e089fc3f533e"
 dependencies = [
  "nota-codec",
  "rkyv",

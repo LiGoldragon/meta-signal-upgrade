@@ -3,6 +3,8 @@
 `owner-signal-upgrade` is the owner-only Signal contract for the
 `upgrade` triad.
 
-This U1 crate is a scaffold only. It carries the macro-backed channel
-shell, observability surface, and `RequestUnimplemented` reply that U3
-will populate with catalogue policy and selector authority operations.
+It merges the catalogue-policy authority from `owner-signal-sema-upgrade`
+with selector authority from `owner-signal-version-handover`.
+`AttemptHandover` is intentionally retired; peers request upgrades through
+the ordinary `signal-upgrade::AttemptUpgrade` operation, while this owner
+contract configures policy and emergency selector controls.

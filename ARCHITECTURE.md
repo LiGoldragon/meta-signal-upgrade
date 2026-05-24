@@ -14,25 +14,24 @@ frame aliases emitted by `signal_channel!`, and round-trip witnesses. It
 does not own runtime policy storage, catalogue mutation, selector state,
 migration execution, socket binding, or Persona unit control.
 
-## U1 Shape
+## Working Shape
 
-U1 is intentionally skeletal. The channel has no domain operations yet;
-it keeps the generated observability verbs and `RequestUnimplemented`
-reply so the runtime placeholder has a typed failure shape.
+The owner channel has seven explicit operations:
 
-U3 populates this crate with the merged owner surface from
-`owner-signal-sema-upgrade` and `owner-signal-version-handover`:
-`Register`, `Allow`, `Block`, `Query`, `ForceFlip`, `Rollback`, and
-`Quarantine`. `AttemptHandover` does not land here; `AttemptUpgrade` on
-the ordinary contract subsumes it in the upgrade daemon.
+- Catalogue policy: `Register`, `Allow`, `Block`, and `Query`.
+- Selector authority: `ForceFlip`, `Rollback`, and `Quarantine`.
+
+`AttemptHandover` does not land here. The upgrade daemon owns orchestration,
+so peers call `AttemptUpgrade` on the ordinary `signal-upgrade` contract.
+Owner authority configures the policy that permits or blocks those attempts
+and keeps emergency selector controls available.
 
 ## Code Map
 
-- `src/lib.rs` declares the scaffold channel and placeholder rejection
-  records.
-- `tests/round_trip.rs` proves the skeleton owner channel round-trips
-  through NOTA and Signal frames.
-- `examples/canonical.nota` records the current placeholder text shape.
+- `src/lib.rs` declares the merged owner channel and typed policy records.
+- `tests/round_trip.rs` proves the merged owner channel round-trips through
+  NOTA and Signal frames.
+- `examples/canonical.nota` records stable owner text examples.
 
 ## Invariants
 
@@ -41,5 +40,5 @@ the ordinary contract subsumes it in the upgrade daemon.
 - The contract crate carries no daemon, actor, database, or Tokio
   runtime code.
 - The owner and ordinary contracts remain separate repositories.
-- This crate depends on `signal-upgrade`; U3 consumes its ordinary
-  shared upgrade vocabulary rather than duplicating it.
+- This crate depends on `signal-upgrade`; catalogue policy records reuse
+  its `ComponentName`, `MigrationIdentifier`, and migration `Version`.
