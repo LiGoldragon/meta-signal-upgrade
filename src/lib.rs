@@ -1,8 +1,8 @@
-//! Signal contract for the owner-only `upgrade` surface.
+//! Meta-signal contract for the owner-only `upgrade` surface.
 //!
 //! This crate carries catalogue policy authority and selector authority
 //! for the `upgrade` runtime. The peer-callable upgrade attempt itself
-//! lives on `signal-upgrade`; this owner contract configures whether
+//! lives on `signal-upgrade`; this meta-signal contract configures whether
 //! those attempts may run and provides emergency selector controls.
 
 pub mod schema {

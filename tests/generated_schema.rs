@@ -1,10 +1,10 @@
-use owner_signal_upgrade::schema::lib::{
+use meta_signal_upgrade::schema::lib::{
     Block, BlockReason, ComponentName, ForceFlip, ForceReason, Input, InputRoute, NexusAction,
     NexusActionRoute, NexusWork, ObjectName, OriginRoute, Output, OutputRoute, PolicyRange,
     SemaWriteInput, SemaWriteInputRoute, SemaWriteOutput, SignalObjectName, TraceEvent,
     VersionLabel,
 };
-use owner_signal_upgrade::schema::lib::{ContractVersion, SelectorVersion};
+use meta_signal_upgrade::schema::lib::{ContractVersion, SelectorVersion};
 
 fn version_label(value: &str) -> VersionLabel {
     String::from(value)
@@ -24,12 +24,12 @@ fn selector_version(label: &str, byte: u64) -> SelectorVersion {
 fn range() -> PolicyRange {
     PolicyRange {
         component: ComponentName::from("persona-spirit"),
-        source: owner_signal_upgrade::schema::lib::MigrationVersion {
+        source: meta_signal_upgrade::schema::lib::MigrationVersion {
             major: 0,
             minor: 1,
             patch: 0,
         },
-        target: owner_signal_upgrade::schema::lib::MigrationVersion {
+        target: meta_signal_upgrade::schema::lib::MigrationVersion {
             major: 0,
             minor: 1,
             patch: 1,
@@ -47,7 +47,7 @@ fn force_flip() -> ForceFlip {
 }
 
 #[test]
-fn generated_owner_input_owns_short_header_and_frame() {
+fn generated_meta_input_owns_short_header_and_frame() {
     let input = Input::force_flip(force_flip());
 
     assert_eq!(input.route(), InputRoute::ForceFlip);
@@ -60,7 +60,7 @@ fn generated_owner_input_owns_short_header_and_frame() {
 }
 
 #[test]
-fn generated_owner_signal_nexus_sema_projection_routes_force_flip() {
+fn generated_meta_signal_nexus_sema_projection_routes_force_flip() {
     let work = NexusWork::signal_arrived(Input::force_flip(force_flip()))
         .with_origin_route(OriginRoute(7));
     let action = work.into_nexus_action();
@@ -80,7 +80,7 @@ fn generated_owner_signal_nexus_sema_projection_routes_force_flip() {
 }
 
 #[test]
-fn generated_owner_sema_reply_projects_back_to_signal_output() {
+fn generated_meta_sema_reply_projects_back_to_signal_output() {
     let output = SemaWriteOutput::blocked(Block {
         component: ComponentName::from("persona-spirit"),
         source: range().source,
@@ -101,7 +101,7 @@ fn generated_owner_sema_reply_projects_back_to_signal_output() {
 }
 
 #[test]
-fn generated_owner_trace_vocabulary_names_owner_operation() {
+fn generated_meta_trace_vocabulary_names_meta_operation() {
     let trace = TraceEvent::new(ObjectName::Signal(SignalObjectName::Input(
         InputRoute::ForceFlip,
     )));

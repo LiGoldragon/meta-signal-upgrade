@@ -1,15 +1,15 @@
 [package]
-name         = "owner-signal-upgrade"
+name         = "meta-signal-upgrade"
 version      = "0.1.0"
 edition      = "2024"
 rust-version = "1.85"
 license      = "MIT OR Apache-2.0"
-repository   = "https://github.com/LiGoldragon/owner-signal-upgrade"
-description  = "Signal contract for the owner-only upgrade surface."
+repository   = "https://github.com/LiGoldragon/meta-signal-upgrade"
+description  = "Meta-signal contract for the owner-only upgrade surface."
 publish      = false
 
 [lib]
-name = "owner_signal_upgrade"
+name = "meta_signal_upgrade"
 path = "src/lib.rs"
 
 [features]

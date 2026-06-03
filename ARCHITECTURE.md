@@ -2,21 +2,21 @@
 
 ## Role
 
-`owner-signal-upgrade` owns the owner-only wire vocabulary for the
+`meta-signal-upgrade` owns the owner-only meta-signal wire vocabulary for the
 `upgrade` runtime. It is the policy and authority contract leg of the
 `upgrade` triad beside the runtime crate `upgrade` and the ordinary
 contract `signal-upgrade`.
 
 ## Boundaries
 
-This crate owns only typed owner Signal records, NOTA projection derives,
+This crate owns only typed meta-signal records, NOTA projection derives,
 frame aliases emitted by `signal_channel!`, and round-trip witnesses. It
 does not own runtime policy storage, catalogue mutation, selector state,
 migration execution, socket binding, or Persona unit control.
 
 ## Working Shape
 
-The owner channel has seven explicit operations:
+The meta channel has seven explicit operations:
 
 - Catalogue policy: `Register`, `Allow`, `Block`, and `Query`.
 - Selector authority: `ForceFlip`, `Rollback`, and `Quarantine`.
@@ -29,17 +29,17 @@ and keeps emergency selector controls available.
 ## Code Map
 
 - `schema/lib.schema` declares the first real schema-next source for
-  the owner-only upgrade signal surface and its generated
+  the owner-only upgrade meta-signal surface and its generated
   Signal/Nexus/SEMA roots.
 - `schema/lib.asschema` and `src/schema/lib.rs` are checked-in
   generated artifacts; `build.rs` fails the build when they are stale.
-- `src/lib.rs` declares the merged owner channel and typed policy records.
-- `tests/round_trip.rs` proves the merged owner channel round-trips through
+- `src/lib.rs` declares the merged meta channel and typed policy records.
+- `tests/round_trip.rs` proves the merged meta channel round-trips through
   NOTA and Signal frames.
-- `tests/generated_schema.rs` executes the generated owner roots: short
+- `tests/generated_schema.rs` executes the generated meta roots: short
   header/frame round-trip, Signal -> Nexus -> SEMA projection, SEMA ->
   Signal reply projection, and typed trace object naming.
-- `examples/canonical.nota` records stable owner text examples.
+- `examples/canonical.nota` records stable meta-signal text examples.
 
 ## Invariants
 
@@ -47,7 +47,7 @@ and keeps emergency selector controls available.
   state, determines the contract split.
 - The contract crate carries no daemon, actor, database, or Tokio
   runtime code.
-- The owner and ordinary contracts remain separate repositories.
+- The meta-signal and ordinary contracts remain separate repositories.
 - This crate depends on `signal-upgrade`; catalogue policy records reuse
   its `ComponentName`, `MigrationIdentifier`, and migration `Version`.
 
@@ -56,14 +56,14 @@ and keeps emergency selector controls available.
 **Status:** migration started. The crate now carries checked-in
 schema-next artifacts beside the hand-written `signal_channel!`
 surface. The generated module is a witness surface until the runtime
-cutover replaces the hand-written owner contract path.
+cutover replaces the hand-written meta-signal contract path.
 
-**Target:** this crate's hand-written `signal_channel!` invocation + typed owner records (`Register`, `Allow`, `Block`, `Query`, `ForceFlip`, `Rollback`, `Quarantine`) converts to a single `owner-signal-upgrade/owner-signal-upgrade.schema` file consumed by the brilliant macro library (`primary-ezqx.1`). The macro emits owner-channel wire types, dispatcher, and storage descriptors for owner-policy state held by the upgrade runtime.
+**Target:** this crate's hand-written `signal_channel!` invocation + typed meta-signal records (`Register`, `Allow`, `Block`, `Query`, `ForceFlip`, `Rollback`, `Quarantine`) converts to a single `meta-signal-upgrade/meta-signal-upgrade.schema` file consumed by the brilliant macro library (`primary-ezqx.1`). The macro emits meta-channel wire types, dispatcher, and storage descriptors for owner-policy state held by the upgrade runtime.
 
-**Sequence:** Spirit pilots `primary-ezqx.1` first; this owner contract's schema cutover lands tightly coupled with `signal-upgrade`'s and the `upgrade` runtime's, because the seven owner verbs configure the policy state that the runtime's catalogue + selector reducers read. The cutover happens as part of the upgrade-triad-as-schema-host work named in the `upgrade` runtime's ARCH.
+**Sequence:** Spirit pilots `primary-ezqx.1` first; this meta-signal contract's schema cutover lands tightly coupled with `signal-upgrade`'s and the `upgrade` runtime's, because the seven owner-only verbs configure the policy state that the runtime's catalogue + selector reducers read. The cutover happens as part of the upgrade-triad-as-schema-host work named in the `upgrade` runtime's ARCH.
 
 **Per-component concerns:**
-- Merged owner contract per /318 — catalogue policy (`Register`, `Allow`, `Block`, `Query`) + selector authority (`ForceFlip`, `Rollback`, `Quarantine`).
+- Merged meta-signal contract per /318 — catalogue policy (`Register`, `Allow`, `Block`, `Query`) + selector authority (`ForceFlip`, `Rollback`, `Quarantine`).
 - `AttemptHandover` deliberately did not land here per /318 design (peers call `AttemptUpgrade` on the ordinary `signal-upgrade` contract; owner authority configures the gating policy). The schema cutover preserves this owner/ordinary split — the macro emits two dispatchers, not one merged surface.
 - Depends on `signal-upgrade` for `ComponentName`, `MigrationIdentifier`, migration `Version`; the schema imports that vocabulary from `signal-upgrade`'s schema.
 

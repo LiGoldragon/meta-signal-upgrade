@@ -8,9 +8,9 @@ use schema_rust_next::{GeneratedFile, RustEmissionOptions, RustEmitter};
 
 fn main() {
     SchemaBuild::from_environment(BuildConfiguration {
-        crate_name: "owner-signal-upgrade",
+        crate_name: "meta-signal-upgrade",
         version: "0.1.0",
-        update_environment_variable: "OWNER_SIGNAL_UPGRADE_UPDATE_SCHEMA_ARTIFACTS",
+        update_environment_variable: "META_SIGNAL_UPGRADE_UPDATE_SCHEMA_ARTIFACTS",
     })
     .run();
 }
@@ -71,7 +71,7 @@ impl SchemaBuild {
         let asschema = recovered_source
             .source()
             .lower(&SchemaEngine::default(), source.identity().clone())
-            .expect("lower owner-signal-upgrade schema source");
+            .expect("lower meta-signal-upgrade schema source");
         let artifact = AsschemaArtifact::new(asschema);
         let artifact_files = GeneratedAsschemaArtifactFiles::new(&self.output_directory);
         artifact
@@ -94,7 +94,7 @@ impl SchemaBuild {
     fn assert_generated_schema_path(&self, generated: &GeneratedFile) {
         if generated.path.as_str() != "src/schema/lib.rs" {
             panic!(
-                "owner-signal-upgrade schema must emit src/schema/lib.rs, found {}",
+                "meta-signal-upgrade schema must emit src/schema/lib.rs, found {}",
                 generated.path
             );
         }

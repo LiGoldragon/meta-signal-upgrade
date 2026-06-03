@@ -1,11 +1,11 @@
-use nota_codec::{Decoder, Encoder, NotaDecode, NotaEncode};
-use owner_signal_upgrade::{
+use meta_signal_upgrade::{
     Block, BlockReason, CatalogueRejectionReason, ForceFlip, ForceReason, ForcedFlip, Frame,
     FrameBody, MigrationState, Operation, OperationKind, PolicyEntry, PolicyRange, PolicyRejected,
     PolicyReported, Quarantine, QuarantineReason, Quarantined, Query, Registration, Rejected,
     Reply, RequestUnimplemented, Rollback, RollbackReason, RolledBack, SelectorRejectionReason,
     SelectorVersion, UnimplementedReason, VersionLabel,
 };
+use nota_codec::{Decoder, Encoder, NotaDecode, NotaEncode};
 use signal_frame::{
     ExchangeIdentifier, ExchangeLane, LaneSequence, NonEmpty, Reply as FrameReply, RequestPayload,
     SessionEpoch, SubReply,
@@ -146,7 +146,7 @@ where
 }
 
 #[test]
-fn catalogue_owner_requests_round_trip_through_signal_frames() {
+fn catalogue_meta_requests_round_trip_through_signal_frames() {
     let operations = [
         Operation::Register(registration()),
         Operation::Allow(range()),
@@ -165,7 +165,7 @@ fn catalogue_owner_requests_round_trip_through_signal_frames() {
 }
 
 #[test]
-fn selector_owner_requests_round_trip_through_signal_frames() {
+fn selector_meta_requests_round_trip_through_signal_frames() {
     let operations = [
         Operation::ForceFlip(force_flip()),
         Operation::Rollback(rollback()),
@@ -178,7 +178,7 @@ fn selector_owner_requests_round_trip_through_signal_frames() {
 }
 
 #[test]
-fn owner_replies_round_trip_through_signal_frames() {
+fn meta_replies_round_trip_through_signal_frames() {
     let replies = [
         Reply::Registered(registration()),
         Reply::Allowed(range()),

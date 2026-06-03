@@ -1,4 +1,4 @@
-(owner-signal-upgrade:lib [0.1.0])
+(meta-signal-upgrade:lib [0.1.0])
 []
 []
 [(Register (Some (Plain Registration))) (Allow (Some (Plain PolicyRange))) (Block (Some (Plain Block))) (Query (Some (Plain Query))) (ForceFlip (Some (Plain ForceFlip))) (Rollback (Some (Plain Rollback))) (Quarantine (Some (Plain Quarantine)))]

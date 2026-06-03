@@ -1,5 +1,5 @@
 {
-  description = "owner-signal-upgrade - owner-only upgrade signal contract scaffold";
+  description = "meta-signal-upgrade - owner-only upgrade meta-signal contract scaffold";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
@@ -57,7 +57,7 @@
             inherit cargoArtifacts;
             cargoTestExtraArgs = "--test generated_schema";
           });
-          generated-schema-source-checked-in = pkgs.runCommand "owner-signal-upgrade-generated-schema-source-checked-in" { } ''
+          generated-schema-source-checked-in = pkgs.runCommand "meta-signal-upgrade-generated-schema-source-checked-in" { } ''
             test -f ${src}/schema/lib.schema
             test -f ${src}/schema/lib.asschema
             test -f ${src}/src/schema/lib.rs
@@ -75,7 +75,7 @@
           });
         };
         devShells.default = pkgs.mkShell {
-          name = "owner-signal-upgrade";
+          name = "meta-signal-upgrade";
           packages = [ pkgs.jujutsu pkgs.pkg-config toolchain ];
         };
       });

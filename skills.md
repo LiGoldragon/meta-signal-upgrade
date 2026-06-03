@@ -1,6 +1,6 @@
-# skills - owner-signal-upgrade
+# skills - meta-signal-upgrade
 
-Read this before editing the owner upgrade contract.
+Read this before editing the upgrade meta-signal contract.
 
 ## Required Context
 
@@ -12,7 +12,7 @@ Read this before editing the owner upgrade contract.
 
 ## Boundary
 
-This crate owns only the owner-only `upgrade` Signal vocabulary. It has
+This crate owns only the owner-only `upgrade` meta-signal vocabulary. It has
 no runtime, actors, sockets, storage, migration modules, Persona handover
 driver, or systemd integration.
 
@@ -21,7 +21,7 @@ driver, or systemd integration.
 - U1 stays scaffold-only. Do not move `owner-signal-sema-upgrade`,
   `owner-signal-version-handover`, `sema-upgrade`, or Persona code into
   this crate in U1.
-- U3 is the first population step for the merged owner contract.
+- U3 is the first population step for the merged meta-signal contract.
 - `AttemptHandover` does not return in this contract; the working
   contract's `AttemptUpgrade` is the upgrade request verb.
 - `RequestUnimplemented` stays available so partial implementations can
