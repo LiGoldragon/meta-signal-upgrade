@@ -5,6 +5,11 @@
 //! lives on `signal-upgrade`; this owner contract configures whether
 //! those attempts may run and provides emergency selector controls.
 
+pub mod schema {
+    #[rustfmt::skip]
+    pub mod lib;
+}
+
 use nota_codec::{NotaEnum, NotaRecord, NotaTransparent};
 use rkyv::{Archive, Deserialize as RkyvDeserialize, Serialize as RkyvSerialize};
 use signal_frame::signal_channel;

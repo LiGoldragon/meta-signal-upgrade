@@ -108,6 +108,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "libc"
+version = "0.2.186"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "68ab91017fe16c622486840e4c83c9a37afeff978bd239b5293d61ece587de66"
+
+[[package]]
 name = "munge"
 version = "0.4.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -148,6 +154,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "nota-next"
+version = "0.1.0"
+source = "git+https://github.com/LiGoldragon/nota-next.git?branch=main#b33b5b51ce10aa7f44027b7290bfe008c90e7ce5"
+dependencies = [
+ "nota-next-derive",
+ "rkyv",
+]
+
+[[package]]
+name = "nota-next-derive"
+version = "0.1.0"
+source = "git+https://github.com/LiGoldragon/nota-next.git?branch=main#b33b5b51ce10aa7f44027b7290bfe008c90e7ce5"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "once_cell"
 version = "1.21.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -158,7 +183,10 @@ name = "owner-signal-upgrade"
 version = "0.1.0"
 dependencies = [
  "nota-codec",
+ "nota-next",
  "rkyv",
+ "schema-next",
+ "schema-rust-next",
  "signal-frame",
  "signal-sema",
  "signal-upgrade",
@@ -226,6 +254,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "redb"
+version = "2.6.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8eca1e9d98d5a7e9002d0013e18d5a9b000aee942eb134883a82f06ebffb6c01"
+dependencies = [
+ "libc",
+]
+
+[[package]]
 name = "rend"
 version = "0.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -269,6 +306,24 @@ name = "rustversion"
 version = "1.0.22"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b39cdef0fa800fc44525c84ccb54a029961a8215f9619753635a9c0d2538d46d"
+
+[[package]]
+name = "schema-next"
+version = "0.1.0"
+source = "git+https://github.com/LiGoldragon/schema-next.git?branch=main#711b5fc9fe8809336c7fc54d90c1aa40cf614cc6"
+dependencies = [
+ "nota-next",
+ "redb",
+ "rkyv",
+]
+
+[[package]]
+name = "schema-rust-next"
+version = "0.1.0"
+source = "git+https://github.com/LiGoldragon/schema-rust-next.git?branch=main#a789a85e71b0c7b60402ca68c5ac553d6ca65a5c"
+dependencies = [
+ "schema-next",
+]
 
 [[package]]
 name = "signal-frame"

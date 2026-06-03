@@ -28,9 +28,17 @@ and keeps emergency selector controls available.
 
 ## Code Map
 
+- `schema/lib.schema` declares the first real schema-next source for
+  the owner-only upgrade signal surface and its generated
+  Signal/Nexus/SEMA roots.
+- `schema/lib.asschema` and `src/schema/lib.rs` are checked-in
+  generated artifacts; `build.rs` fails the build when they are stale.
 - `src/lib.rs` declares the merged owner channel and typed policy records.
 - `tests/round_trip.rs` proves the merged owner channel round-trips through
   NOTA and Signal frames.
+- `tests/generated_schema.rs` executes the generated owner roots: short
+  header/frame round-trip, Signal -> Nexus -> SEMA projection, SEMA ->
+  Signal reply projection, and typed trace object naming.
 - `examples/canonical.nota` records stable owner text examples.
 
 ## Invariants
@@ -45,7 +53,10 @@ and keeps emergency selector controls available.
 
 ## Pending schema-engine upgrade
 
-**Status:** scheduled for migration to schema-language-based contract per `reports/designer/326-v13-spirit-complete-schema-vision.md` + `reports/designer/324-migration-mvp-spirit-handover-re-specification.md`.
+**Status:** migration started. The crate now carries checked-in
+schema-next artifacts beside the hand-written `signal_channel!`
+surface. The generated module is a witness surface until the runtime
+cutover replaces the hand-written owner contract path.
 
 **Target:** this crate's hand-written `signal_channel!` invocation + typed owner records (`Register`, `Allow`, `Block`, `Query`, `ForceFlip`, `Rollback`, `Quarantine`) converts to a single `owner-signal-upgrade/owner-signal-upgrade.schema` file consumed by the brilliant macro library (`primary-ezqx.1`). The macro emits owner-channel wire types, dispatcher, and storage descriptors for owner-policy state held by the upgrade runtime.
 

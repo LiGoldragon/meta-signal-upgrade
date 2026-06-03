@@ -24,8 +24,14 @@
         ];
         craneLib = (crane.mkLib pkgs).overrideToolchain toolchain;
         examplesFilter = path: _type: builtins.match ".*/examples(/.*)?$" path != null;
+        schemaFilter = path: type:
+          type == "regular"
+            && ((pkgs.lib.hasSuffix ".schema" path)
+              || (pkgs.lib.hasSuffix ".asschema" path));
         sourceFilter = path: type:
-          (craneLib.filterCargoSources path type) || (examplesFilter path type);
+          (craneLib.filterCargoSources path type)
+            || (examplesFilter path type)
+            || (schemaFilter path type);
         src = pkgs.lib.cleanSourceWith {
           src = ./.;
           filter = sourceFilter;
@@ -47,6 +53,17 @@
             inherit cargoArtifacts;
             cargoTestExtraArgs = "--test round_trip";
           });
+          test-generated-schema = craneLib.cargoTest (commonArguments // {
+            inherit cargoArtifacts;
+            cargoTestExtraArgs = "--test generated_schema";
+          });
+          generated-schema-source-checked-in = pkgs.runCommand "owner-signal-upgrade-generated-schema-source-checked-in" { } ''
+            test -f ${src}/schema/lib.schema
+            test -f ${src}/schema/lib.asschema
+            test -f ${src}/src/schema/lib.rs
+            ! grep -R "include!(concat!(env!(\"OUT_DIR\")" ${src}/src ${src}/build.rs
+            touch $out
+          '';
           doc = craneLib.cargoDoc (commonArguments // {
             inherit cargoArtifacts;
             RUSTDOCFLAGS = "-D warnings";
