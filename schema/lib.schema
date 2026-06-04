@@ -46,12 +46,4 @@
   Rejected { component ComponentName reason SelectorRejectionReason }
   UnimplementedReason [NotBuiltYet IntegrationNotLanded]
   RequestUnimplemented { reason UnimplementedReason }
-  NexusWork [(SignalArrived Input) (SemaWriteCompleted SemaWriteOutput) (SemaReadCompleted SemaReadOutput) (EffectCompleted NexusEffectResult)]
-  NexusAction [(CommandSemaWrite SemaWriteInput) (CommandSemaRead SemaReadInput) (ReplyToSignal Output) (CommandEffect NexusEffectCommand) (Continue NexusWork)]
-  NexusEffectCommand [(NotifySelector ForceFlip)]
-  NexusEffectResult [(SelectorNotified ForcedFlip)]
-  SemaWriteInput [(Register Registration) (Allow PolicyRange) (Block Block) (ForceFlip ForceFlip) (Rollback Rollback) (Quarantine Quarantine)]
-  SemaReadInput [(Query Query)]
-  SemaWriteOutput [(Registered Registration) (Allowed PolicyRange) (Blocked Block) (PolicyRejected PolicyRejected) (FlipForced ForcedFlip) (RolledBack RolledBack) (Quarantined Quarantined) (Rejected Rejected) (RequestUnimplemented RequestUnimplemented)]
-  SemaReadOutput [(PolicyReported PolicyReported) (PolicyRejected PolicyRejected) (RequestUnimplemented RequestUnimplemented)]
 }

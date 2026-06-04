@@ -1,10 +1,11 @@
 use meta_signal_upgrade::schema::lib::{
-    Block, BlockReason, ComponentName, ForceFlip, ForceReason, Input, InputRoute, NexusAction,
-    NexusActionRoute, NexusWork, ObjectName, OriginRoute, Output, OutputRoute, PolicyRange,
-    SemaWriteInput, SemaWriteInputRoute, SemaWriteOutput, SignalObjectName, TraceEvent,
-    VersionLabel,
+    Block, BlockReason, ComponentName, ForceFlip, ForceReason, Input, InputRoute, Output,
+    OutputRoute, PolicyRange, VersionLabel,
 };
 use meta_signal_upgrade::schema::lib::{ContractVersion, SelectorVersion};
+
+const SCHEMA_SOURCE: &str = include_str!("../schema/lib.schema");
+const GENERATED_SCHEMA_RUST: &str = include_str!("../src/schema/lib.rs");
 
 fn version_label(value: &str) -> VersionLabel {
     String::from(value)
@@ -60,51 +61,50 @@ fn generated_meta_input_owns_short_header_and_frame() {
 }
 
 #[test]
-fn generated_meta_signal_nexus_sema_projection_routes_force_flip() {
-    let work = NexusWork::signal_arrived(Input::force_flip(force_flip()))
-        .with_origin_route(OriginRoute(7));
-    let action = work.into_nexus_action();
-
-    assert_eq!(action.origin_route(), OriginRoute(7));
-    assert_eq!(action.root().route(), NexusActionRoute::CommandSemaWrite);
-    match action.root() {
-        NexusAction::CommandSemaWrite(SemaWriteInput::ForceFlip(payload)) => {
-            assert_eq!(payload.component, "persona-spirit");
-        }
-        other => panic!("expected ForceFlip SEMA write, got {other:?}"),
-    }
-
-    let sema_input = action.into_sema_write_input();
-    assert_eq!(sema_input.origin_route(), OriginRoute(7));
-    assert_eq!(sema_input.root().route(), SemaWriteInputRoute::ForceFlip);
-}
-
-#[test]
-fn generated_meta_sema_reply_projects_back_to_signal_output() {
-    let output = SemaWriteOutput::blocked(Block {
+fn generated_meta_output_owns_short_header_and_frame() {
+    let output = Output::blocked(Block {
         component: ComponentName::from("persona-spirit"),
         source: range().source,
         target: range().target,
         reason: BlockReason::Unsafe,
-    })
-    .with_origin_route(OriginRoute(11))
-    .into_nexus_work()
-    .into_nexus_action()
-    .into_signal_output();
+    });
 
-    assert_eq!(output.origin_route(), OriginRoute(11));
-    assert_eq!(output.root().route(), OutputRoute::Blocked);
-    match output.into_root() {
+    assert_eq!(output.route(), OutputRoute::Blocked);
+
+    let frame = output
+        .encode_signal_frame()
+        .expect("encode generated output");
+    let (route, decoded) = Output::decode_signal_frame(&frame).expect("decode generated output");
+
+    assert_eq!(route, OutputRoute::Blocked);
+    match decoded {
         Output::Blocked(block) => assert_eq!(block.reason, BlockReason::Unsafe),
         other => panic!("expected Blocked output, got {other:?}"),
     }
 }
 
 #[test]
-fn generated_meta_trace_vocabulary_names_meta_operation() {
-    let trace = TraceEvent::new(ObjectName::Signal(SignalObjectName::Input(
-        InputRoute::ForceFlip,
-    )));
-
-    assert_eq!(trace.name(), "SignalInputForceFlip");
+fn generated_meta_contract_surface_excludes_runtime_plane_terms() {
+    for term in [
+        "NexusWork",
+        "NexusAction",
+        "CommandSemaWrite",
+        "CommandSemaRead",
+        "SemaWriteInput",
+        "SemaReadInput",
+        "SemaWriteOutput",
+        "SemaReadOutput",
+        "SignalEngine",
+        "NexusEngine",
+        "SemaEngine",
+    ] {
+        assert!(
+            !SCHEMA_SOURCE.contains(term),
+            "contract schema must not declare runtime term {term}"
+        );
+        assert!(
+            !GENERATED_SCHEMA_RUST.contains(term),
+            "generated contract module must not export runtime term {term}"
+        );
+    }
 }

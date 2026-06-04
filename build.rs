@@ -9,7 +9,7 @@ use schema_rust_next::{GeneratedFile, RustEmissionOptions, RustEmitter};
 fn main() {
     SchemaBuild::from_environment(BuildConfiguration {
         crate_name: "meta-signal-upgrade",
-        version: "0.1.0",
+        version: "0.2.0",
         update_environment_variable: "META_SIGNAL_UPGRADE_UPDATE_SCHEMA_ARTIFACTS",
     })
     .run();

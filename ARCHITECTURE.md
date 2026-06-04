@@ -5,7 +5,9 @@
 `meta-signal-upgrade` owns the owner-only meta-signal wire vocabulary for the
 `upgrade` runtime. It is the policy and authority contract leg of the
 `upgrade` triad beside the runtime crate `upgrade` and the ordinary
-contract `signal-upgrade`.
+contract `signal-upgrade`. The separate meta-signal repository keeps
+owner/security-sensitive policy edits isolated from ordinary peer
+communication dependencies.
 
 ## Boundaries
 
@@ -13,6 +15,8 @@ This crate owns only typed meta-signal records, NOTA projection derives,
 frame aliases emitted by `signal_channel!`, and round-trip witnesses. It
 does not own runtime policy storage, catalogue mutation, selector state,
 migration execution, socket binding, or Persona unit control.
+Daemon-internal Signal/Nexus/SEMA plane schemas live inside the
+`upgrade` runtime crate, not in this external contract repository.
 
 ## Working Shape
 
@@ -30,15 +34,15 @@ and keeps emergency selector controls available.
 
 - `schema/lib.schema` declares the first real schema-next source for
   the owner-only upgrade meta-signal surface and its generated
-  Signal/Nexus/SEMA roots.
+  wire-only Input/Output roots.
 - `schema/lib.asschema` and `src/schema/lib.rs` are checked-in
   generated artifacts; `build.rs` fails the build when they are stale.
 - `src/lib.rs` declares the merged meta channel and typed policy records.
 - `tests/round_trip.rs` proves the merged meta channel round-trips through
   NOTA and Signal frames.
-- `tests/generated_schema.rs` executes the generated meta roots: short
-  header/frame round-trip, Signal -> Nexus -> SEMA projection, SEMA ->
-  Signal reply projection, and typed trace object naming.
+- `tests/generated_schema.rs` exercises generated Input/Output
+  short-header/frame round-trips and guards against generated
+  Nexus/SEMA runtime terms in this contract.
 - `examples/canonical.nota` records stable meta-signal text examples.
 
 ## Invariants
