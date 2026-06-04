@@ -4,7 +4,7 @@ use std::{
 };
 
 use schema_next::{AsschemaArtifact, SchemaEngine, SchemaPackage, SchemaSourceArtifact};
-use schema_rust_next::{GeneratedFile, RustEmissionOptions, RustEmitter};
+use schema_rust_next::{GeneratedFile, RustEmissionOptions, RustEmissionTarget, RustEmitter};
 
 fn main() {
     SchemaBuild::from_environment(BuildConfiguration {
@@ -85,10 +85,13 @@ impl SchemaBuild {
         checked_in_artifact
             .assert_matches_generated_artifact(&artifact_files, self.should_update_artifacts());
 
-        RustEmitter::new(RustEmissionOptions::feature_gated_nota("nota-text"))
-            .emit_file_from_nota_path(checked_in_artifact.path())
-            .expect("emit Rust from checked-in asschema NOTA artifact")
-            .assert_matches_binary_artifact(&artifact_files)
+        RustEmitter::new(
+            RustEmissionOptions::feature_gated_nota("nota-text")
+                .with_target(RustEmissionTarget::WireContract),
+        )
+        .emit_file_from_nota_path(checked_in_artifact.path())
+        .expect("emit Rust from checked-in asschema NOTA artifact")
+        .assert_matches_binary_artifact(&artifact_files)
     }
 
     fn assert_generated_schema_path(&self, generated: &GeneratedFile) {
@@ -221,9 +224,12 @@ impl GeneratedFileArtifactWitness for GeneratedFile {
         self,
         artifact_files: &GeneratedAsschemaArtifactFiles,
     ) -> Self {
-        let from_binary = RustEmitter::new(RustEmissionOptions::feature_gated_nota("nota-text"))
-            .emit_file_from_binary_path(artifact_files.binary_path())
-            .expect("emit Rust from generated asschema rkyv artifact");
+        let from_binary = RustEmitter::new(
+            RustEmissionOptions::feature_gated_nota("nota-text")
+                .with_target(RustEmissionTarget::WireContract),
+        )
+        .emit_file_from_binary_path(artifact_files.binary_path())
+        .expect("emit Rust from generated asschema rkyv artifact");
         if self != from_binary {
             panic!(
                 "generated Rust differs between asschema NOTA artifact {} and rkyv artifact {}",

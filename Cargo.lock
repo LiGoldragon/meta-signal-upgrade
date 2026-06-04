@@ -115,7 +115,7 @@ checksum = "68ab91017fe16c622486840e4c83c9a37afeff978bd239b5293d61ece587de66"
 
 [[package]]
 name = "meta-signal-upgrade"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "nota-codec",
  "nota-next",
@@ -319,8 +319,8 @@ dependencies = [
 
 [[package]]
 name = "schema-rust-next"
-version = "0.1.0"
-source = "git+https://github.com/LiGoldragon/schema-rust-next.git?branch=main#a789a85e71b0c7b60402ca68c5ac553d6ca65a5c"
+version = "0.1.1"
+source = "git+https://github.com/LiGoldragon/schema-rust-next.git?branch=main#052d1b2b26ef1f2f8c0ad775574dd0ee30afb280"
 dependencies = [
  "schema-next",
 ]

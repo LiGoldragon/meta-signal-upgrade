@@ -42,7 +42,8 @@ and keeps emergency selector controls available.
   NOTA and Signal frames.
 - `tests/generated_schema.rs` exercises generated Input/Output
   short-header/frame round-trips and guards against generated
-  Nexus/SEMA runtime terms in this contract.
+  Nexus/SEMA runtime terms, trace/mail helpers, and generic plane
+  envelopes in this contract.
 - `examples/canonical.nota` records stable meta-signal text examples.
 
 ## Invariants
@@ -51,6 +52,8 @@ and keeps emergency selector controls available.
   state, determines the contract split.
 - The contract crate carries no daemon, actor, database, or Tokio
   runtime code.
+- The generated schema module is emitted with the schema-rust
+  `WireContract` target, so it carries wire types/codecs only.
 - The meta-signal and ordinary contracts remain separate repositories.
 - This crate depends on `signal-upgrade`; catalogue policy records reuse
   its `ComponentName`, `MigrationIdentifier`, and migration `Version`.
