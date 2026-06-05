@@ -171,8 +171,8 @@ dependencies = [
 
 [[package]]
 name = "nota-next"
-version = "0.1.0"
-source = "git+https://github.com/LiGoldragon/nota-next.git?branch=main#b33b5b51ce10aa7f44027b7290bfe008c90e7ce5"
+version = "0.3.0"
+source = "git+https://github.com/LiGoldragon/nota-next.git?branch=main#fb600e327157df47a0d18a42c25821a7e06a30a9"
 dependencies = [
  "nota-next-derive",
  "rkyv",
@@ -180,8 +180,8 @@ dependencies = [
 
 [[package]]
 name = "nota-next-derive"
-version = "0.1.0"
-source = "git+https://github.com/LiGoldragon/nota-next.git?branch=main#b33b5b51ce10aa7f44027b7290bfe008c90e7ce5"
+version = "0.2.0"
+source = "git+https://github.com/LiGoldragon/nota-next.git?branch=main#fb600e327157df47a0d18a42c25821a7e06a30a9"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -309,8 +309,8 @@ checksum = "b39cdef0fa800fc44525c84ccb54a029961a8215f9619753635a9c0d2538d46d"
 
 [[package]]
 name = "schema-next"
-version = "0.1.0"
-source = "git+https://github.com/LiGoldragon/schema-next.git?branch=main#711b5fc9fe8809336c7fc54d90c1aa40cf614cc6"
+version = "0.1.4"
+source = "git+https://github.com/LiGoldragon/schema-next.git?branch=main#bc59bcb89a9090b922703ccd7c52251fe7d347c0"
 dependencies = [
  "nota-next",
  "redb",
@@ -319,10 +319,11 @@ dependencies = [
 
 [[package]]
 name = "schema-rust-next"
-version = "0.1.1"
-source = "git+https://github.com/LiGoldragon/schema-rust-next.git?branch=main#052d1b2b26ef1f2f8c0ad775574dd0ee30afb280"
+version = "0.1.12"
+source = "git+https://github.com/LiGoldragon/schema-rust-next.git?branch=main#99af362a02f77914b95a92e0eb8584e2f1ce2f25"
 dependencies = [
  "schema-next",
+ "thiserror",
 ]
 
 [[package]]

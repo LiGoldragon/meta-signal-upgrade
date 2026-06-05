@@ -35,8 +35,10 @@ and keeps emergency selector controls available.
 - `schema/lib.schema` declares the first real schema-next source for
   the owner-only upgrade meta-signal surface and its generated
   wire-only Input/Output roots.
-- `schema/lib.asschema` and `src/schema/lib.rs` are checked-in
-  generated artifacts; `build.rs` fails the build when they are stale.
+- `src/schema/lib.rs` is the checked-in generated Rust interface;
+  `build.rs` deserializes `schema/lib.schema` into `SchemaSource`,
+  validates the schema-in-Rust value through text and rkyv round-trips,
+  and fails the build when the generated Rust is stale.
 - `src/lib.rs` declares the merged meta channel and typed policy records.
 - `tests/round_trip.rs` proves the merged meta channel round-trips through
   NOTA and Signal frames.
