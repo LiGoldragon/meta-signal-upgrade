@@ -6,7 +6,7 @@ use meta_signal_upgrade::{
     RollbackReason, RolledBack, SelectorRejectionReason, SelectorVersion, UnimplementedReason,
     VersionLabel,
 };
-use nota_codec::{Decoder, Encoder, NotaDecode, NotaEncode};
+use nota_next::{NotaDecode, NotaEncode, NotaSource};
 use signal_frame::{
     ExchangeIdentifier, ExchangeLane, LaneSequence, NonEmpty, Reply as FrameReply, RequestPayload,
     SessionEpoch, SubReply,
@@ -125,9 +125,7 @@ fn round_trip_reply(reply: Reply) -> Reply {
 }
 
 fn encode<T: NotaEncode>(value: &T) -> String {
-    let mut encoder = Encoder::new();
-    value.encode(&mut encoder).expect("encode nota");
-    encoder.into_string()
+    value.to_nota()
 }
 
 fn round_trip_nota<T>(value: T, expected: &str)
@@ -137,8 +135,7 @@ where
     let encoded = encode(&value);
     assert_eq!(encoded, expected);
 
-    let mut decoder = Decoder::new(&encoded);
-    let recovered = T::decode(&mut decoder).expect("decode nota");
+    let recovered = NotaSource::new(&encoded).parse::<T>().expect("decode nota");
     assert_eq!(recovered, value);
     assert!(
         CANONICAL.contains(expected),
@@ -260,8 +257,9 @@ fn effect_event_uses_contract_owned_outcome_not_sema_observation() {
     assert_eq!(encoded, "(ForceFlip FlipForced)");
     assert!(!encoded.contains("Sema"));
 
-    let mut decoder = Decoder::new(&encoded);
-    let recovered = EffectEmitted::decode(&mut decoder).expect("decode event");
+    let recovered = NotaSource::new(&encoded)
+        .parse::<EffectEmitted>()
+        .expect("decode event");
     assert_eq!(recovered, event);
 }
 
@@ -269,11 +267,11 @@ fn effect_event_uses_contract_owned_outcome_not_sema_observation() {
 fn catalogue_canonical_nota_examples_round_trip() {
     round_trip_nota(
         Operation::Register(registration()),
-        "(Register (persona-spirit (0 1 0) (0 1 1) persona-spirit-0-1-0-to-0-1-1 Enabled))",
+        "(Register ([persona-spirit] (0 1 0) (0 1 1) [persona-spirit-0-1-0-to-0-1-1] Enabled))",
     );
     round_trip_nota(
         Operation::Allow(range()),
-        "(Allow (persona-spirit (0 1 0) (0 1 1)))",
+        "(Allow ([persona-spirit] (0 1 0) (0 1 1)))",
     );
     round_trip_nota(
         Operation::Block(Block {
@@ -282,12 +280,12 @@ fn catalogue_canonical_nota_examples_round_trip() {
             target: MigrationVersion::new(0, 1, 2),
             reason: BlockReason::Unsafe,
         }),
-        "(Block (persona-spirit (0 1 0) (0 1 2) Unsafe))",
+        "(Block ([persona-spirit] (0 1 0) (0 1 2) Unsafe))",
     );
     round_trip_nota(Operation::Query(Query::All), "(Query All)");
     round_trip_nota(
         Reply::Registered(registration()),
-        "(Registered (persona-spirit (0 1 0) (0 1 1) persona-spirit-0-1-0-to-0-1-1 Enabled))",
+        "(Registered ([persona-spirit] (0 1 0) (0 1 1) [persona-spirit-0-1-0-to-0-1-1] Enabled))",
     );
     round_trip_nota(
         Reply::PolicyReported(PolicyReported {
@@ -298,7 +296,7 @@ fn catalogue_canonical_nota_examples_round_trip() {
                 state: MigrationState::Enabled,
             }],
         }),
-        "(PolicyReported ([(persona-spirit (0 1 0) (0 1 1) Enabled)]))",
+        "(PolicyReported ([([persona-spirit] (0 1 0) (0 1 1) Enabled)]))",
     );
 }
 

@@ -2,7 +2,7 @@
 name         = "meta-signal-upgrade"
 version      = "0.2.1"
 edition      = "2024"
-rust-version = "1.85"
+rust-version = "1.88"
 license      = "MIT OR Apache-2.0"
 repository   = "https://github.com/LiGoldragon/meta-signal-upgrade"
 description  = "Meta-signal contract for the meta-policy upgrade surface."
@@ -14,11 +14,10 @@ path = "src/lib.rs"
 
 [features]
 default = []
-nota-text = ["dep:nota-next"]
+nota-text = []
 
 [dependencies]
-nota-next        = { git = "https://github.com/LiGoldragon/nota-next.git", branch = "main", optional = true }
-nota-codec        = { git = "https://github.com/LiGoldragon/nota-codec.git", branch = "main" }
+nota-next        = { git = "https://github.com/LiGoldragon/nota-next.git", branch = "main" }
 rkyv              = { version = "0.8", default-features = false, features = ["std", "bytecheck", "little_endian", "pointer_width_32", "unaligned"] }
 signal-frame      = { git = "https://github.com/LiGoldragon/signal-frame.git", branch = "main" }
 signal-upgrade    = { git = "https://github.com/LiGoldragon/signal-upgrade.git", branch = "main" }
