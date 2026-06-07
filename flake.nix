@@ -1,5 +1,5 @@
 {
-  description = "meta-signal-upgrade - owner-only upgrade meta-signal contract scaffold";
+  description = "meta-signal-upgrade - meta-policy upgrade meta-signal contract scaffold";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";

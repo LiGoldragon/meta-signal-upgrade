@@ -12,7 +12,7 @@ Read this before editing the upgrade meta-signal contract.
 
 ## Boundary
 
-This crate owns only the owner-only `upgrade` meta-signal vocabulary. It has
+This crate owns only the meta-policy `upgrade` meta-signal vocabulary. It has
 no runtime, actors, sockets, storage, migration modules, Persona handover
 driver, or systemd integration.
 

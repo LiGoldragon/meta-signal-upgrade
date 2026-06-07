@@ -1,4 +1,4 @@
-//! Meta-signal contract for the owner-only `upgrade` surface.
+//! Meta-signal contract for the meta-policy `upgrade` surface.
 //!
 //! This crate carries catalogue policy authority and selector authority
 //! for the `upgrade` runtime. The peer-callable upgrade attempt itself

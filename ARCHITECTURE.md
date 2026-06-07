@@ -2,11 +2,11 @@
 
 ## Role
 
-`meta-signal-upgrade` owns the owner-only meta-signal wire vocabulary for the
+`meta-signal-upgrade` owns the meta-policy signal wire vocabulary for the
 `upgrade` runtime. It is the policy and authority contract leg of the
 `upgrade` triad beside the runtime crate `upgrade` and the ordinary
 contract `signal-upgrade`. The separate meta-signal repository keeps
-owner/security-sensitive policy edits isolated from ordinary peer
+meta-policy-sensitive policy edits isolated from ordinary peer
 communication dependencies.
 
 ## Boundaries
@@ -27,13 +27,13 @@ The meta channel has seven explicit operations:
 
 `AttemptHandover` does not land here. The upgrade daemon owns orchestration,
 so peers call `AttemptUpgrade` on the ordinary `signal-upgrade` contract.
-Owner authority configures the policy that permits or blocks those attempts
+meta authority configures the policy that permits or blocks those attempts
 and keeps emergency selector controls available.
 
 ## Code Map
 
 - `schema/lib.schema` declares the first real schema-next source for
-  the owner-only upgrade meta-signal surface and its generated
+  the meta-policy upgrade meta-signal surface and its generated
   wire-only Input/Output roots.
 - `src/schema/lib.rs` is the checked-in generated Rust interface;
   `build.rs` deserializes `schema/lib.schema` into `SchemaSource`,
@@ -50,7 +50,7 @@ and keeps emergency selector controls available.
 
 ## Invariants
 
-- Owner-only operations live here because caller authority, not touched
+- Meta-policy operations live here because caller authority, not touched
   state, determines the contract split.
 - The contract crate carries no daemon, actor, database, or Tokio
   runtime code.
@@ -67,13 +67,13 @@ schema-next artifacts beside the hand-written `signal_channel!`
 surface. The generated module is a witness surface until the runtime
 cutover replaces the hand-written meta-signal contract path.
 
-**Target:** this crate's hand-written `signal_channel!` invocation + typed meta-signal records (`Register`, `Allow`, `Block`, `Query`, `ForceFlip`, `Rollback`, `Quarantine`) converts to a single `meta-signal-upgrade/meta-signal-upgrade.schema` file consumed by the brilliant macro library (`primary-ezqx.1`). The macro emits meta-channel wire types, dispatcher, and storage descriptors for owner-policy state held by the upgrade runtime.
+**Target:** this crate's hand-written `signal_channel!` invocation + typed meta-signal records (`Register`, `Allow`, `Block`, `Query`, `ForceFlip`, `Rollback`, `Quarantine`) converts to a single `meta-signal-upgrade/meta-signal-upgrade.schema` file consumed by the brilliant macro library (`primary-ezqx.1`). The macro emits meta-channel wire types, dispatcher, and storage descriptors for meta-policy state held by the upgrade runtime.
 
-**Sequence:** Spirit pilots `primary-ezqx.1` first; this meta-signal contract's schema cutover lands tightly coupled with `signal-upgrade`'s and the `upgrade` runtime's, because the seven owner-only verbs configure the policy state that the runtime's catalogue + selector reducers read. The cutover happens as part of the upgrade-triad-as-schema-host work named in the `upgrade` runtime's ARCH.
+**Sequence:** Spirit pilots `primary-ezqx.1` first; this meta-signal contract's schema cutover lands tightly coupled with `signal-upgrade`'s and the `upgrade` runtime's, because the seven meta-policy verbs configure the policy state that the runtime's catalogue + selector reducers read. The cutover happens as part of the upgrade-triad-as-schema-host work named in the `upgrade` runtime's ARCH.
 
 **Per-component concerns:**
 - Merged meta-signal contract per /318 — catalogue policy (`Register`, `Allow`, `Block`, `Query`) + selector authority (`ForceFlip`, `Rollback`, `Quarantine`).
-- `AttemptHandover` deliberately did not land here per /318 design (peers call `AttemptUpgrade` on the ordinary `signal-upgrade` contract; owner authority configures the gating policy). The schema cutover preserves this owner/ordinary split — the macro emits two dispatchers, not one merged surface.
+- `AttemptHandover` deliberately did not land here per /318 design (peers call `AttemptUpgrade` on the ordinary `signal-upgrade` contract; meta authority configures the gating policy). The schema cutover preserves this meta/ordinary split — the macro emits two dispatchers, not one merged surface.
 - Depends on `signal-upgrade` for `ComponentName`, `MigrationIdentifier`, migration `Version`; the schema imports that vocabulary from `signal-upgrade`'s schema.
 
 **References:**

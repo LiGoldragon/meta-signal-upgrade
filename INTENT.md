@@ -1,7 +1,7 @@
 # INTENT — meta-signal-upgrade
 
-*The owner-only meta-signal contract for the `upgrade` component. Defines the
-typed request/reply channel the upgrade owner uses to manage upgrade catalogue
+*The meta-policy signal contract for the `upgrade` component. Defines the
+typed request/reply channel the upgrade meta authority uses to manage upgrade catalogue
 policy and selector authority — force-flip, rollback, and quarantine.
 Companion to `ARCHITECTURE.md` and `Cargo.toml`. Maintenance: `primary/skills/repo-intent.md`.*
 
@@ -14,10 +14,10 @@ stay in `signal-upgrade/INTENT.md`.
 
 ## Why this repo exists
 
-`meta-signal-upgrade` is the **owner-only meta-signal contract** for the `upgrade`
+`meta-signal-upgrade` is the **meta-policy signal contract** for the `upgrade`
 runtime — the policy and authority leg of the upgrade triad beside the runtime
 crate `upgrade` and the ordinary contract `signal-upgrade`. The separate
-meta-signal repository keeps owner/security-sensitive policy edits isolated from
+meta-signal repository keeps meta-policy-sensitive policy edits isolated from
 ordinary peer communication dependencies.
 
 ## The channel shape
@@ -31,14 +31,14 @@ The meta channel has seven explicit operations:
 
 `AttemptHandover` deliberately does not land here: the upgrade daemon owns
 orchestration, so peers call `AttemptUpgrade` on the ordinary `signal-upgrade`
-contract. Owner authority configures the policy that permits or blocks those
+contract. meta authority configures the policy that permits or blocks those
 attempts and keeps emergency selector controls available. Catalogue policy records
 reuse `ComponentName`, `MigrationIdentifier`, and migration `Version` from
 `signal-upgrade`.
 
 ## Constraints
 
-- Owner-only operations live here because caller authority, not touched state,
+- Meta-policy operations live here because caller authority, not touched state,
   determines the contract split.
 - The meta-signal and ordinary contracts remain separate repositories.
 - This crate carries no daemon, actor, database, or Tokio runtime code — only
@@ -53,12 +53,12 @@ reuse `ComponentName`, `MigrationIdentifier`, and migration `Version` from
 
 Migration to schema-next has started: the crate carries checked-in schema-next
 artifacts beside the hand-written `signal_channel!` surface. `schema/lib.schema`
-declares the owner-only upgrade meta-signal source; `build.rs` deserializes it
+declares the meta-policy upgrade meta-signal source; `build.rs` deserializes it
 into `SchemaSource`, validates the schema-in-Rust value through text and rkyv
 round-trips, and fails the build when the generated Rust is stale. The generated
 module is a witness surface until the runtime cutover replaces the hand-written
 meta-signal contract path. The cutover lands tightly coupled with `signal-upgrade`
-and the `upgrade` runtime, because the seven owner-only verbs configure the policy
+and the `upgrade` runtime, because the seven meta-policy verbs configure the policy
 state the runtime's catalogue and selector reducers read.
 
 ## Non-ownership
