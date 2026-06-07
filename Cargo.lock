@@ -117,7 +117,6 @@ dependencies = [
  "schema-next",
  "schema-rust-next",
  "signal-frame",
- "signal-sema",
  "signal-upgrade",
  "thiserror",
  "version-projection",
@@ -348,26 +347,15 @@ dependencies = [
 ]
 
 [[package]]
-name = "signal-sema"
-version = "0.1.0"
-source = "git+https://github.com/LiGoldragon/signal-sema.git?branch=main#c132e9a06431617055bad2a9bae7bbecdeacd4b0"
-dependencies = [
- "nota-codec",
- "rkyv",
- "thiserror",
-]
-
-[[package]]
 name = "signal-upgrade"
 version = "0.2.1"
-source = "git+https://github.com/LiGoldragon/signal-upgrade.git?branch=main#820ebc2a68b974ba1ae3aaf66df1b8d6b2e59667"
+source = "git+https://github.com/LiGoldragon/signal-upgrade.git?branch=main#619d5f5eac785ceb7721255a9b37ce507d93eb61"
 dependencies = [
  "nota-codec",
  "rkyv",
  "schema-next",
  "schema-rust-next",
  "signal-frame",
- "signal-sema",
  "thiserror",
  "version-projection",
 ]

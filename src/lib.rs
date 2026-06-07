@@ -13,7 +13,6 @@ pub mod schema {
 use nota_codec::{NotaEnum, NotaRecord, NotaTransparent};
 use rkyv::{Archive, Deserialize as RkyvDeserialize, Serialize as RkyvSerialize};
 use signal_frame::signal_channel;
-use signal_sema::SemaObservation;
 use signal_upgrade::{ComponentName, MigrationIdentifier, Version as MigrationVersion};
 use version_projection::{ComponentName as ProjectionComponentName, ContractVersion};
 
@@ -250,7 +249,7 @@ pub struct RequestUnimplemented {
 }
 
 signal_channel! {
-    channel OwnerUpgrade {
+    channel MetaUpgrade {
         operation Register(Registration),
         operation Allow(PolicyRange),
         operation Block(Block),
@@ -285,5 +284,23 @@ pub struct OperationReceived {
 
 #[derive(Archive, RkyvSerialize, RkyvDeserialize, NotaRecord, Debug, Clone, PartialEq, Eq)]
 pub struct EffectEmitted {
-    pub observation: SemaObservation,
+    pub operation: OperationKind,
+    pub outcome: EffectOutcome,
+}
+
+#[derive(
+    Archive, RkyvSerialize, RkyvDeserialize, NotaEnum, Debug, Clone, Copy, PartialEq, Eq, Hash,
+)]
+pub enum EffectOutcome {
+    Registered,
+    Allowed,
+    Blocked,
+    PolicyReported,
+    PolicyRejected,
+    FlipForced,
+    RolledBack,
+    Quarantined,
+    Rejected,
+    RequestUnimplemented,
+    NoChange,
 }

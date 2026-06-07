@@ -44,7 +44,7 @@ reuse `ComponentName`, `MigrationIdentifier`, and migration `Version` from
 - This crate carries no daemon, actor, database, or Tokio runtime code — only
   typed meta-signal records, NOTA projection derives, frame aliases, and
   round-trip witnesses.
-- The generated schema module is emitted with the schema-rust `WireContract`
+- The generated schema module is emitted with the `schema-rust-next` `WireContract`
   target, so it carries wire types and codecs only — no Nexus/SEMA runtime terms,
   trace/mail helpers, or generic plane envelopes.
 - This crate depends on `signal-upgrade` for the shared catalogue nouns.

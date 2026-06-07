@@ -1,9 +1,10 @@
 use meta_signal_upgrade::{
-    Block, BlockReason, CatalogueRejectionReason, ForceFlip, ForceReason, ForcedFlip, Frame,
-    FrameBody, MigrationState, Operation, OperationKind, PolicyEntry, PolicyRange, PolicyRejected,
-    PolicyReported, Quarantine, QuarantineReason, Quarantined, Query, Registration, Rejected,
-    Reply, RequestUnimplemented, Rollback, RollbackReason, RolledBack, SelectorRejectionReason,
-    SelectorVersion, UnimplementedReason, VersionLabel,
+    Block, BlockReason, CatalogueRejectionReason, EffectEmitted, EffectOutcome, ForceFlip,
+    ForceReason, ForcedFlip, Frame, FrameBody, MigrationState, Operation, OperationKind,
+    PolicyEntry, PolicyRange, PolicyRejected, PolicyReported, Quarantine, QuarantineReason,
+    Quarantined, Query, Registration, Rejected, Reply, RequestUnimplemented, Rollback,
+    RollbackReason, RolledBack, SelectorRejectionReason, SelectorVersion, UnimplementedReason,
+    VersionLabel,
 };
 use nota_codec::{Decoder, Encoder, NotaDecode, NotaEncode};
 use signal_frame::{
@@ -246,6 +247,22 @@ fn operation_kinds_are_generated_without_attempt_handover() {
         Operation::Quarantine(quarantine()).kind(),
         OperationKind::Quarantine
     );
+}
+
+#[test]
+fn effect_event_uses_contract_owned_outcome_not_sema_observation() {
+    let event = EffectEmitted {
+        operation: OperationKind::ForceFlip,
+        outcome: EffectOutcome::FlipForced,
+    };
+
+    let encoded = encode(&event);
+    assert_eq!(encoded, "(ForceFlip FlipForced)");
+    assert!(!encoded.contains("Sema"));
+
+    let mut decoder = Decoder::new(&encoded);
+    let recovered = EffectEmitted::decode(&mut decoder).expect("decode event");
+    assert_eq!(recovered, event);
 }
 
 #[test]

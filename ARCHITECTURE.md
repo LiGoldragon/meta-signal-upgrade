@@ -54,7 +54,7 @@ and keeps emergency selector controls available.
   state, determines the contract split.
 - The contract crate carries no daemon, actor, database, or Tokio
   runtime code.
-- The generated schema module is emitted with the schema-rust
+- The generated schema module is emitted with `schema-rust-next`
   `WireContract` target, so it carries wire types/codecs only.
 - The meta-signal and ordinary contracts remain separate repositories.
 - This crate depends on `signal-upgrade`; catalogue policy records reuse
@@ -67,7 +67,7 @@ schema-next artifacts beside the hand-written `signal_channel!`
 surface. The generated module is a witness surface until the runtime
 cutover replaces the hand-written meta-signal contract path.
 
-**Target:** this crate's hand-written `signal_channel!` invocation + typed meta-signal records (`Register`, `Allow`, `Block`, `Query`, `ForceFlip`, `Rollback`, `Quarantine`) converts to a single `meta-signal-upgrade/meta-signal-upgrade.schema` file consumed by the brilliant macro library (`primary-ezqx.1`). The macro emits meta-channel wire types, dispatcher, and storage descriptors for meta-policy state held by the upgrade runtime.
+**Target:** this crate's hand-written `signal_channel!` invocation + typed meta-signal records (`Register`, `Allow`, `Block`, `Query`, `ForceFlip`, `Rollback`, `Quarantine`) converts fully to the checked-in `schema/lib.schema` source. `schema-rust-next` emits meta-channel wire types, dispatcher, and storage descriptors for meta-policy state held by the upgrade runtime.
 
 **Sequence:** Spirit pilots `primary-ezqx.1` first; this meta-signal contract's schema cutover lands tightly coupled with `signal-upgrade`'s and the `upgrade` runtime's, because the seven meta-policy verbs configure the policy state that the runtime's catalogue + selector reducers read. The cutover happens as part of the upgrade-triad-as-schema-host work named in the `upgrade` runtime's ARCH.
 
