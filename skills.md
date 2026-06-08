@@ -19,7 +19,7 @@ driver, or systemd integration.
 ## Invariants
 
 - U1 stays scaffold-only. Do not move `owner-signal-sema-upgrade`,
-  `owner-signal-version-handover`, `sema-upgrade`, or Persona code into
+  `meta-signal-version-handover`, `sema-upgrade`, or Persona code into
   this crate in U1.
 - U3 is the first population step for the merged meta-signal contract.
 - `AttemptHandover` does not return in this contract; the working
