@@ -10,33 +10,26 @@ pub mod schema {
     pub mod lib;
 }
 
-use nota_next::{NotaDecode, NotaEncode};
 use rkyv::{Archive, Deserialize as RkyvDeserialize, Serialize as RkyvSerialize};
 use signal_frame::signal_channel;
 use signal_upgrade::{ComponentName, MigrationIdentifier, Version as MigrationVersion};
 use version_projection::{ComponentName as ProjectionComponentName, ContractVersion};
 
-#[derive(
-    Archive,
-    RkyvSerialize,
-    RkyvDeserialize,
-    NotaEncode,
-    NotaDecode,
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    Hash,
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota_next::NotaEncode, nota_next::NotaDecode)
 )]
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum MigrationState {
     Enabled,
     Disabled,
 }
 
-#[derive(
-    Archive, RkyvSerialize, RkyvDeserialize, NotaEncode, NotaDecode, Debug, Clone, PartialEq, Eq,
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota_next::NotaEncode, nota_next::NotaDecode)
 )]
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, Debug, Clone, PartialEq, Eq)]
 pub struct Registration {
     pub component: ComponentName,
     pub source: MigrationVersion,
@@ -45,9 +38,11 @@ pub struct Registration {
     pub state: MigrationState,
 }
 
-#[derive(
-    Archive, RkyvSerialize, RkyvDeserialize, NotaEncode, NotaDecode, Debug, Clone, PartialEq, Eq,
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota_next::NotaEncode, nota_next::NotaDecode)
 )]
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, Debug, Clone, PartialEq, Eq)]
 pub struct PolicyRange {
     pub component: ComponentName,
     pub source: MigrationVersion,
@@ -78,28 +73,22 @@ impl From<signal_upgrade::Attempt> for PolicyRange {
     }
 }
 
-#[derive(
-    Archive,
-    RkyvSerialize,
-    RkyvDeserialize,
-    NotaEncode,
-    NotaDecode,
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    Hash,
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota_next::NotaEncode, nota_next::NotaDecode)
 )]
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum BlockReason {
     Unsafe,
     Superseded,
     NotReviewed,
 }
 
-#[derive(
-    Archive, RkyvSerialize, RkyvDeserialize, NotaEncode, NotaDecode, Debug, Clone, PartialEq, Eq,
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota_next::NotaEncode, nota_next::NotaDecode)
 )]
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, Debug, Clone, PartialEq, Eq)]
 pub struct Block {
     pub component: ComponentName,
     pub source: MigrationVersion,
@@ -107,17 +96,21 @@ pub struct Block {
     pub reason: BlockReason,
 }
 
-#[derive(
-    Archive, RkyvSerialize, RkyvDeserialize, NotaEncode, NotaDecode, Debug, Clone, PartialEq, Eq,
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota_next::NotaEncode, nota_next::NotaDecode)
 )]
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, Debug, Clone, PartialEq, Eq)]
 pub enum Query {
     All,
     Component(ComponentName),
 }
 
-#[derive(
-    Archive, RkyvSerialize, RkyvDeserialize, NotaEncode, NotaDecode, Debug, Clone, PartialEq, Eq,
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota_next::NotaEncode, nota_next::NotaDecode)
 )]
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, Debug, Clone, PartialEq, Eq)]
 pub struct PolicyEntry {
     pub component: ComponentName,
     pub source: MigrationVersion,
@@ -125,35 +118,31 @@ pub struct PolicyEntry {
     pub state: MigrationState,
 }
 
-#[derive(
-    Archive, RkyvSerialize, RkyvDeserialize, NotaEncode, NotaDecode, Debug, Clone, PartialEq, Eq,
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota_next::NotaEncode, nota_next::NotaDecode)
 )]
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, Debug, Clone, PartialEq, Eq)]
 pub struct PolicyReported {
     pub entries: Vec<PolicyEntry>,
 }
 
-#[derive(
-    Archive,
-    RkyvSerialize,
-    RkyvDeserialize,
-    NotaEncode,
-    NotaDecode,
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    Hash,
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota_next::NotaEncode, nota_next::NotaDecode)
 )]
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum CatalogueRejectionReason {
     UnknownMigration,
     AlreadyRegistered,
     NotAllowed,
 }
 
-#[derive(
-    Archive, RkyvSerialize, RkyvDeserialize, NotaEncode, NotaDecode, Debug, Clone, PartialEq, Eq,
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota_next::NotaEncode, nota_next::NotaDecode)
 )]
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, Debug, Clone, PartialEq, Eq)]
 pub struct PolicyRejected {
     pub component: ComponentName,
     pub source: MigrationVersion,
@@ -161,9 +150,11 @@ pub struct PolicyRejected {
     pub reason: CatalogueRejectionReason,
 }
 
-#[derive(
-    Archive, RkyvSerialize, RkyvDeserialize, NotaEncode, NotaDecode, Debug, Clone, PartialEq, Eq,
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota_next::NotaEncode, nota_next::NotaDecode)
 )]
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, Debug, Clone, PartialEq, Eq)]
 pub struct SelectorVersion {
     pub label: VersionLabel,
     pub contract_version: ContractVersion,
@@ -178,18 +169,11 @@ impl SelectorVersion {
     }
 }
 
-#[derive(
-    Archive,
-    RkyvSerialize,
-    RkyvDeserialize,
-    NotaEncode,
-    NotaDecode,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Hash,
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota_next::NotaEncode, nota_next::NotaDecode)
 )]
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, Debug, Clone, PartialEq, Eq, Hash)]
 pub struct VersionLabel(String);
 
 impl VersionLabel {
@@ -202,66 +186,44 @@ impl VersionLabel {
     }
 }
 
-#[derive(
-    Archive,
-    RkyvSerialize,
-    RkyvDeserialize,
-    NotaEncode,
-    NotaDecode,
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    Hash,
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota_next::NotaEncode, nota_next::NotaDecode)
 )]
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ForceReason {
     OperatorOverride,
     MarkerMismatchAccepted,
     EmergencyRecovery,
 }
 
-#[derive(
-    Archive,
-    RkyvSerialize,
-    RkyvDeserialize,
-    NotaEncode,
-    NotaDecode,
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    Hash,
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota_next::NotaEncode, nota_next::NotaDecode)
 )]
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum RollbackReason {
     PostCutoverFailure,
     OperatorOverride,
     RecoveryDrill,
 }
 
-#[derive(
-    Archive,
-    RkyvSerialize,
-    RkyvDeserialize,
-    NotaEncode,
-    NotaDecode,
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    Hash,
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota_next::NotaEncode, nota_next::NotaDecode)
 )]
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum QuarantineReason {
     FailedUpgrade,
     SuspectState,
     OperatorHold,
 }
 
-#[derive(
-    Archive, RkyvSerialize, RkyvDeserialize, NotaEncode, NotaDecode, Debug, Clone, PartialEq, Eq,
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota_next::NotaEncode, nota_next::NotaDecode)
 )]
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, Debug, Clone, PartialEq, Eq)]
 pub struct ForceFlip {
     pub component: ProjectionComponentName,
     pub current_version: SelectorVersion,
@@ -269,9 +231,11 @@ pub struct ForceFlip {
     pub reason: ForceReason,
 }
 
-#[derive(
-    Archive, RkyvSerialize, RkyvDeserialize, NotaEncode, NotaDecode, Debug, Clone, PartialEq, Eq,
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota_next::NotaEncode, nota_next::NotaDecode)
 )]
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, Debug, Clone, PartialEq, Eq)]
 pub struct Rollback {
     pub component: ProjectionComponentName,
     pub active_version: SelectorVersion,
@@ -279,52 +243,52 @@ pub struct Rollback {
     pub reason: RollbackReason,
 }
 
-#[derive(
-    Archive, RkyvSerialize, RkyvDeserialize, NotaEncode, NotaDecode, Debug, Clone, PartialEq, Eq,
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota_next::NotaEncode, nota_next::NotaDecode)
 )]
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, Debug, Clone, PartialEq, Eq)]
 pub struct Quarantine {
     pub component: ProjectionComponentName,
     pub version: SelectorVersion,
     pub reason: QuarantineReason,
 }
 
-#[derive(
-    Archive, RkyvSerialize, RkyvDeserialize, NotaEncode, NotaDecode, Debug, Clone, PartialEq, Eq,
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota_next::NotaEncode, nota_next::NotaDecode)
 )]
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, Debug, Clone, PartialEq, Eq)]
 pub struct ForcedFlip {
     pub component: ProjectionComponentName,
     pub active_version: SelectorVersion,
 }
 
-#[derive(
-    Archive, RkyvSerialize, RkyvDeserialize, NotaEncode, NotaDecode, Debug, Clone, PartialEq, Eq,
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota_next::NotaEncode, nota_next::NotaDecode)
 )]
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, Debug, Clone, PartialEq, Eq)]
 pub struct RolledBack {
     pub component: ProjectionComponentName,
     pub active_version: SelectorVersion,
 }
 
-#[derive(
-    Archive, RkyvSerialize, RkyvDeserialize, NotaEncode, NotaDecode, Debug, Clone, PartialEq, Eq,
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota_next::NotaEncode, nota_next::NotaDecode)
 )]
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, Debug, Clone, PartialEq, Eq)]
 pub struct Quarantined {
     pub component: ProjectionComponentName,
     pub version: SelectorVersion,
 }
 
-#[derive(
-    Archive,
-    RkyvSerialize,
-    RkyvDeserialize,
-    NotaEncode,
-    NotaDecode,
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    Hash,
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota_next::NotaEncode, nota_next::NotaDecode)
 )]
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum SelectorRejectionReason {
     UnknownComponent,
     UnknownVersion,
@@ -336,35 +300,31 @@ pub enum SelectorRejectionReason {
     UpgradeSocketUnavailable,
 }
 
-#[derive(
-    Archive, RkyvSerialize, RkyvDeserialize, NotaEncode, NotaDecode, Debug, Clone, PartialEq, Eq,
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota_next::NotaEncode, nota_next::NotaDecode)
 )]
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, Debug, Clone, PartialEq, Eq)]
 pub struct Rejected {
     pub component: ProjectionComponentName,
     pub reason: SelectorRejectionReason,
 }
 
-#[derive(
-    Archive,
-    RkyvSerialize,
-    RkyvDeserialize,
-    NotaEncode,
-    NotaDecode,
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    Hash,
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota_next::NotaEncode, nota_next::NotaDecode)
 )]
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum UnimplementedReason {
     NotBuiltYet,
     IntegrationNotLanded,
 }
 
-#[derive(
-    Archive, RkyvSerialize, RkyvDeserialize, NotaEncode, NotaDecode, Debug, Clone, PartialEq, Eq,
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota_next::NotaEncode, nota_next::NotaDecode)
 )]
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, Debug, Clone, PartialEq, Eq)]
 pub struct RequestUnimplemented {
     pub reason: UnimplementedReason,
 }
@@ -398,34 +358,30 @@ signal_channel! {
     }
 }
 
-#[derive(
-    Archive, RkyvSerialize, RkyvDeserialize, NotaEncode, NotaDecode, Debug, Clone, PartialEq, Eq,
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota_next::NotaEncode, nota_next::NotaDecode)
 )]
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, Debug, Clone, PartialEq, Eq)]
 pub struct OperationReceived {
     pub operation: OperationKind,
 }
 
-#[derive(
-    Archive, RkyvSerialize, RkyvDeserialize, NotaEncode, NotaDecode, Debug, Clone, PartialEq, Eq,
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota_next::NotaEncode, nota_next::NotaDecode)
 )]
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, Debug, Clone, PartialEq, Eq)]
 pub struct EffectEmitted {
     pub operation: OperationKind,
     pub outcome: EffectOutcome,
 }
 
-#[derive(
-    Archive,
-    RkyvSerialize,
-    RkyvDeserialize,
-    NotaEncode,
-    NotaDecode,
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    Hash,
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota_next::NotaEncode, nota_next::NotaDecode)
 )]
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum EffectOutcome {
     Registered,
     Allowed,

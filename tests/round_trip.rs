@@ -1,11 +1,13 @@
 use meta_signal_upgrade::{
-    Block, BlockReason, CatalogueRejectionReason, EffectEmitted, EffectOutcome, ForceFlip,
-    ForceReason, ForcedFlip, Frame, FrameBody, MigrationState, Operation, OperationKind,
-    PolicyEntry, PolicyRange, PolicyRejected, PolicyReported, Quarantine, QuarantineReason,
-    Quarantined, Query, Registration, Rejected, Reply, RequestUnimplemented, Rollback,
-    RollbackReason, RolledBack, SelectorRejectionReason, SelectorVersion, UnimplementedReason,
-    VersionLabel,
+    Block, BlockReason, CatalogueRejectionReason, ForceFlip, ForceReason, ForcedFlip, Frame,
+    FrameBody, MigrationState, Operation, OperationKind, PolicyEntry, PolicyRange, PolicyRejected,
+    PolicyReported, Quarantine, QuarantineReason, Quarantined, Query, Registration, Rejected,
+    Reply, RequestUnimplemented, Rollback, RollbackReason, RolledBack, SelectorRejectionReason,
+    SelectorVersion, UnimplementedReason, VersionLabel,
 };
+#[cfg(feature = "nota-text")]
+use meta_signal_upgrade::{EffectEmitted, EffectOutcome};
+#[cfg(feature = "nota-text")]
 use nota_next::{NotaDecode, NotaEncode, NotaSource};
 use signal_frame::{
     ExchangeIdentifier, ExchangeLane, LaneSequence, NonEmpty, Reply as FrameReply, RequestPayload,
@@ -14,6 +16,7 @@ use signal_frame::{
 use signal_upgrade::{ComponentName, MigrationIdentifier, Version as MigrationVersion};
 use version_projection::{ComponentName as ProjectionComponentName, ContractVersion};
 
+#[cfg(feature = "nota-text")]
 const CANONICAL: &str = include_str!("../examples/canonical.nota");
 
 fn exchange() -> ExchangeIdentifier {
@@ -124,10 +127,12 @@ fn round_trip_reply(reply: Reply) -> Reply {
     }
 }
 
+#[cfg(feature = "nota-text")]
 fn encode<T: NotaEncode>(value: &T) -> String {
     value.to_nota()
 }
 
+#[cfg(feature = "nota-text")]
 fn round_trip_nota<T>(value: T, expected: &str)
 where
     T: NotaEncode + NotaDecode + PartialEq + std::fmt::Debug,
@@ -247,6 +252,7 @@ fn operation_kinds_are_generated_without_attempt_handover() {
 }
 
 #[test]
+#[cfg(feature = "nota-text")]
 fn effect_event_uses_contract_owned_outcome_not_sema_observation() {
     let event = EffectEmitted {
         operation: OperationKind::ForceFlip,
@@ -264,6 +270,7 @@ fn effect_event_uses_contract_owned_outcome_not_sema_observation() {
 }
 
 #[test]
+#[cfg(feature = "nota-text")]
 fn catalogue_canonical_nota_examples_round_trip() {
     round_trip_nota(
         Operation::Register(registration()),
@@ -301,6 +308,7 @@ fn catalogue_canonical_nota_examples_round_trip() {
 }
 
 #[test]
+#[cfg(feature = "nota-text")]
 fn selector_canonical_nota_examples_round_trip() {
     round_trip_nota(
         Operation::ForceFlip(force_flip()),

@@ -42,12 +42,15 @@ reuse `ComponentName`, `MigrationIdentifier`, and migration `Version` from
   determines the contract split.
 - The meta-signal and ordinary contracts remain separate repositories.
 - This crate carries no daemon, actor, database, or Tokio runtime code — only
-  typed meta-signal records, NOTA projection derives, frame aliases, and
+  typed meta-signal records, optional NOTA projection derives, frame aliases, and
   round-trip witnesses.
 - The generated schema module is emitted with the `schema-rust-next` `WireContract`
   target, so it carries wire types and codecs only — no Nexus/SEMA runtime terms,
   trace/mail helpers, or generic plane envelopes.
 - This crate depends on `signal-upgrade` for the shared catalogue nouns.
+- Text projection is explicit. The default dependency graph is binary-only and
+  must not pull `nota-next`, `nota-codec`, or `signal-core`; `nota-text` enables
+  generated and hand-written NOTA derives/impls for CLI and witness builds.
 
 ## Schema-engine upgrade track
 
