@@ -32,9 +32,9 @@ The meta channel has seven explicit operations:
 `AttemptHandover` deliberately does not land here: the upgrade daemon owns
 orchestration, so peers call `AttemptUpgrade` on the ordinary `signal-upgrade`
 contract. meta authority configures the policy that permits or blocks those
-attempts and keeps emergency selector controls available. Catalogue policy records
-reuse `ComponentName`, `MigrationIdentifier`, and migration `Version` from
-`signal-upgrade`.
+attempts and keeps emergency selector controls available. Catalogue policy
+records use contract-local `ComponentName`, `MigrationIdentifier`, and
+`MigrationVersion` wire nouns.
 
 The old `owner-signal-sema-upgrade` prototype is archived. Its
 catalogue-policy role is merged into this meta-signal contract rather than
@@ -45,28 +45,26 @@ renamed into a separate `meta-signal-sema-upgrade` repository.
 - Meta-policy operations live here because caller authority, not touched state,
   determines the contract split.
 - The meta-signal and ordinary contracts remain separate repositories.
-- This crate carries no daemon, actor, database, or Tokio runtime code — only
+- This crate carries no daemon, actor, database, or Tokio runtime code - only
   typed meta-signal records, optional NOTA projection derives, frame aliases, and
   round-trip witnesses.
 - The generated schema module is emitted with the `schema-rust-next` `WireContract`
-  target, so it carries wire types and codecs only — no Nexus/SEMA runtime terms,
-  trace/mail helpers, or generic plane envelopes.
-- This crate depends on `signal-upgrade` for the shared catalogue nouns.
+  target, so it carries wire types, short-header codecs, and `signal-frame`
+  request/reply aliases only - no Nexus/SEMA runtime terms, trace/mail helpers,
+  or generic plane envelopes.
 - Text projection is explicit. The default dependency graph is binary-only and
   must not pull `nota-next`, `nota-codec`, or `signal-core`; `nota-text` enables
-  generated and hand-written NOTA derives/impls for CLI and witness builds.
+  generated NOTA derives/impls for CLI and witness builds.
 
-## Schema-engine upgrade track
+## Schema-derived stack
 
-Migration to schema-next has started: the crate carries checked-in schema-next
-artifacts beside the hand-written `signal_channel!` surface. `schema/lib.schema`
-declares the meta-policy upgrade meta-signal source; `build.rs` deserializes it
-into `SchemaSource`, validates the schema-in-Rust value through text and rkyv
-round-trips, and fails the build when the generated Rust is stale. The generated
-module is a witness surface until the runtime cutover replaces the hand-written
-meta-signal contract path. The cutover lands tightly coupled with `signal-upgrade`
-and the `upgrade` runtime, because the seven meta-policy verbs configure the policy
-state the runtime's catalogue and selector reducers read.
+This contract is schema-derived. `schema/lib.schema` declares the
+meta-policy upgrade meta-signal source; `build.rs` deserializes it into
+`SchemaSource`, validates the schema-in-Rust value through text and rkyv
+round-trips, and fails the build when the generated Rust is stale. There
+is no parallel hand-written channel surface. The seven meta-policy verbs
+configure the policy state that the `upgrade` runtime's catalogue and
+selector reducers read.
 
 ## Non-ownership
 
@@ -80,8 +78,8 @@ This crate does not own:
 
 ## See also
 
-- `ARCHITECTURE.md` — working shape, code map, and the schema-engine upgrade track.
-- `../upgrade/INTENT.md` — daemon-side intent (catalogue, selector, migration runtime).
-- `../signal-upgrade/INTENT.md` — ordinary upgrade-attempt contract.
-- `primary/skills/contract-repo.md` — contract repo discipline and naming rules.
-- `primary/skills/component-triad.md` — repo triad structure and authority tiers.
+- `ARCHITECTURE.md` - working shape, code map, and the schema-derived stack.
+- `../upgrade/INTENT.md` - daemon-side intent (catalogue, selector, migration runtime).
+- `../signal-upgrade/INTENT.md` - ordinary upgrade-attempt contract.
+- `primary/skills/contract-repo.md` - contract repo discipline and naming rules.
+- `primary/skills/component-triad.md` - repo triad structure and authority tiers.

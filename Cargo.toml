@@ -17,17 +17,13 @@ default = []
 nota-text = [
     "dep:nota-next",
     "signal-frame/nota-text",
-    "signal-upgrade/nota-text",
-    "version-projection/nota-text",
 ]
 
 [dependencies]
 nota-next        = { git = "https://github.com/LiGoldragon/nota-next.git", branch = "main", optional = true }
 rkyv              = { version = "0.8", default-features = false, features = ["std", "bytecheck", "little_endian", "pointer_width_32", "unaligned"] }
 signal-frame      = { git = "https://github.com/LiGoldragon/signal-frame.git", branch = "main", default-features = false }
-signal-upgrade    = { git = "https://github.com/LiGoldragon/signal-upgrade.git", branch = "main", default-features = false }
 thiserror         = "2"
-version-projection = { git = "https://github.com/LiGoldragon/version-projection.git", branch = "main", default-features = false }
 
 [dev-dependencies]
 nota-next        = { git = "https://github.com/LiGoldragon/nota-next.git", branch = "main" }

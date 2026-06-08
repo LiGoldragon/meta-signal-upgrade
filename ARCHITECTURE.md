@@ -12,7 +12,7 @@ communication dependencies.
 ## Boundaries
 
 This crate owns only typed meta-signal records, optional NOTA projection
-derives, frame aliases emitted by `signal_channel!`, and round-trip
+derives, generated `signal-frame` aliases/codecs, and round-trip
 witnesses. It does not own runtime policy storage, catalogue mutation,
 selector state, migration execution, socket binding, or Persona unit
 control. Daemon-internal Signal/Nexus/SEMA plane schemas live inside the
@@ -42,7 +42,8 @@ role is merged here rather than preserved as a separate meta-signal repo.
   `build.rs` deserializes `schema/lib.schema` into `SchemaSource`,
   validates the schema-in-Rust value through text and rkyv round-trips,
   and fails the build when the generated Rust is stale.
-- `src/lib.rs` declares the merged meta channel and typed policy records.
+- `src/lib.rs` re-exports the generated schema module as the crate's
+  public contract API.
 - `tests/round_trip.rs` proves the merged meta channel round-trips through
   Signal frames in default mode and through NOTA under `nota-text`.
 - `tests/dependency_boundary.rs` pins the feature boundary: default builds
@@ -65,24 +66,25 @@ role is merged here rather than preserved as a separate meta-signal repo.
 - NOTA parsing/rendering is feature-gated under `nota-text`; the default
   contract graph is binary-only for daemon consumers.
 - The meta-signal and ordinary contracts remain separate repositories.
-- This crate depends on `signal-upgrade`; catalogue policy records reuse
-  its `ComponentName`, `MigrationIdentifier`, and migration `Version`.
+- Catalogue policy records use contract-local `ComponentName`,
+  `MigrationIdentifier`, and `MigrationVersion` wire nouns.
 
-## Pending schema-engine upgrade
+## Schema-derived contract
 
-**Status:** migration started. The crate now carries checked-in
-schema-next artifacts beside the hand-written `signal_channel!`
-surface. The generated module is a witness surface until the runtime
-cutover replaces the hand-written meta-signal contract path.
+**Status:** migrated. The crate's public API is emitted from
+`schema/lib.schema`; there is no parallel hand-written channel surface.
 
-**Target:** this crate's hand-written `signal_channel!` invocation + typed meta-signal records (`Register`, `Allow`, `Block`, `Query`, `ForceFlip`, `Rollback`, `Quarantine`) converts fully to the checked-in `schema/lib.schema` source. `schema-rust-next` emits meta-channel wire types, dispatcher, and storage descriptors for meta-policy state held by the upgrade runtime.
-
-**Sequence:** Spirit pilots `primary-ezqx.1` first; this meta-signal contract's schema cutover lands tightly coupled with `signal-upgrade`'s and the `upgrade` runtime's, because the seven meta-policy verbs configure the policy state that the runtime's catalogue + selector reducers read. The cutover happens as part of the upgrade-triad-as-schema-host work named in the `upgrade` runtime's ARCH.
+`schema-rust-next` emits the wire types, short-header projection,
+request/reply frame aliases, and binary codecs. It does not emit daemon
+runtime planes here.
 
 **Per-component concerns:**
-- Merged meta-signal contract per /318 — catalogue policy (`Register`, `Allow`, `Block`, `Query`) + selector authority (`ForceFlip`, `Rollback`, `Quarantine`).
-- `AttemptHandover` deliberately did not land here per /318 design (peers call `AttemptUpgrade` on the ordinary `signal-upgrade` contract; meta authority configures the gating policy). The schema cutover preserves this meta/ordinary split — the macro emits two dispatchers, not one merged surface.
-- Depends on `signal-upgrade` for `ComponentName`, `MigrationIdentifier`, migration `Version`; the schema imports that vocabulary from `signal-upgrade`'s schema.
+- Merged meta-signal contract per /318: catalogue policy (`Register`,
+  `Allow`, `Block`, `Query`) plus selector authority (`ForceFlip`,
+  `Rollback`, `Quarantine`).
+- `AttemptHandover` deliberately did not land here per /318 design:
+  peers call `AttemptUpgrade` on the ordinary `signal-upgrade`
+  contract; meta authority configures the gating policy.
 
 **References:**
 - `reports/designer/326-v13-spirit-complete-schema-vision.md` — uniform header form + schema-language design

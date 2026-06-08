@@ -18,11 +18,9 @@ driver, or systemd integration.
 
 ## Invariants
 
-- U1 stays scaffold-only. Do not resurrect the archived
-  `owner-signal-sema-upgrade` prototype, and do not move
-  `meta-signal-version-handover`, `sema-upgrade`, or Persona code into this
-  crate in U1.
-- U3 is the first population step for the merged meta-signal contract.
+- `schema/lib.schema` is the source of truth for the public contract.
+- `src/lib.rs` re-exports the generated contract surface; do not add a
+  parallel hand-written channel.
 - `AttemptHandover` does not return in this contract; the working
   contract's `AttemptUpgrade` is the upgrade request verb.
 - `RequestUnimplemented` stays available so partial implementations can

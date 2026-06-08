@@ -9,3 +9,4 @@ archived; its catalogue-policy role is merged here.
 `AttemptHandover` is intentionally retired; peers request upgrades through
 the ordinary `signal-upgrade::AttemptUpgrade` operation, while this
 meta-signal contract configures policy and emergency selector controls.
+The public API is generated from `schema/lib.schema`.

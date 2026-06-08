@@ -1,20 +1,17 @@
 use meta_signal_upgrade::{
-    Block, BlockReason, CatalogueRejectionReason, ForceFlip, ForceReason, ForcedFlip, Frame,
-    FrameBody, MigrationState, Operation, OperationKind, PolicyEntry, PolicyRange, PolicyRejected,
-    PolicyReported, Quarantine, QuarantineReason, Quarantined, Query, Registration, Rejected,
-    Reply, RequestUnimplemented, Rollback, RollbackReason, RolledBack, SelectorRejectionReason,
-    SelectorVersion, UnimplementedReason, VersionLabel,
+    Block, BlockReason, CatalogueRejectionReason, ComponentName, ContractVersion, ForceFlip,
+    ForceReason, ForcedFlip, Frame, FrameBody, Input, InputRoute, MigrationIdentifier,
+    MigrationState, MigrationVersion, Output, OutputRoute, PolicyEntry, PolicyRange,
+    PolicyRejected, Quarantine, QuarantineReason, Quarantined, Query, Registration, Rejected,
+    Rollback, RollbackReason, RolledBack, SelectorRejectionReason, SelectorVersion,
+    UnimplementedReason, VersionLabel,
 };
-#[cfg(feature = "nota-text")]
-use meta_signal_upgrade::{EffectEmitted, EffectOutcome};
 #[cfg(feature = "nota-text")]
 use nota_next::{NotaDecode, NotaEncode, NotaSource};
 use signal_frame::{
-    ExchangeIdentifier, ExchangeLane, LaneSequence, NonEmpty, Reply as FrameReply, RequestPayload,
-    SessionEpoch, SubReply,
+    ExchangeIdentifier, ExchangeLane, LaneSequence, Reply as FrameReply, SessionEpoch,
+    SignalOperationHeads, SubReply,
 };
-use signal_upgrade::{ComponentName, MigrationIdentifier, Version as MigrationVersion};
-use version_projection::{ComponentName as ProjectionComponentName, ContractVersion};
 
 #[cfg(feature = "nota-text")]
 const CANONICAL: &str = include_str!("../examples/canonical.nota");
@@ -27,29 +24,33 @@ fn exchange() -> ExchangeIdentifier {
     )
 }
 
-fn catalogue_component() -> ComponentName {
-    ComponentName::new("persona-spirit")
-}
-
-fn projection_component() -> ProjectionComponentName {
-    ProjectionComponentName::new("persona-spirit")
+fn component() -> ComponentName {
+    String::from("persona-spirit")
 }
 
 fn source() -> MigrationVersion {
-    MigrationVersion::new(0, 1, 0)
+    MigrationVersion {
+        major: 0,
+        minor: 1,
+        patch: 0,
+    }
 }
 
 fn target() -> MigrationVersion {
-    MigrationVersion::new(0, 1, 1)
+    MigrationVersion {
+        major: 0,
+        minor: 1,
+        patch: 1,
+    }
 }
 
 fn migration_identifier() -> MigrationIdentifier {
-    MigrationIdentifier::new("persona-spirit-0-1-0-to-0-1-1")
+    String::from("persona-spirit-0-1-0-to-0-1-1")
 }
 
 fn registration() -> Registration {
     Registration {
-        component: catalogue_component(),
+        component: component(),
         source: source(),
         target: target(),
         migration: migration_identifier(),
@@ -58,20 +59,31 @@ fn registration() -> Registration {
 }
 
 fn range() -> PolicyRange {
-    PolicyRange::new(catalogue_component(), source(), target())
+    PolicyRange {
+        component: component(),
+        source: source(),
+        target: target(),
+    }
 }
 
-fn contract_version(byte: u8) -> ContractVersion {
-    ContractVersion::new([byte; 32])
+fn contract_version(byte: u64) -> ContractVersion {
+    ContractVersion::new(vec![byte; 32])
 }
 
-fn selector_version(label: &str, byte: u8) -> SelectorVersion {
-    SelectorVersion::new(VersionLabel::new(label), contract_version(byte))
+fn version_label(value: &str) -> VersionLabel {
+    String::from(value)
+}
+
+fn selector_version(label: &str, byte: u64) -> SelectorVersion {
+    SelectorVersion {
+        label: version_label(label),
+        contract_version: contract_version(byte),
+    }
 }
 
 fn force_flip() -> ForceFlip {
     ForceFlip {
-        component: projection_component(),
+        component: component(),
         current_version: selector_version("v0.1.0", 1),
         target_version: selector_version("v0.1.1", 2),
         reason: ForceReason::OperatorOverride,
@@ -80,7 +92,7 @@ fn force_flip() -> ForceFlip {
 
 fn rollback() -> Rollback {
     Rollback {
-        component: projection_component(),
+        component: component(),
         active_version: selector_version("v0.1.1", 2),
         restore_version: selector_version("v0.1.0", 1),
         reason: RollbackReason::PostCutoverFailure,
@@ -89,17 +101,14 @@ fn rollback() -> Rollback {
 
 fn quarantine() -> Quarantine {
     Quarantine {
-        component: projection_component(),
+        component: component(),
         version: selector_version("v0.1.1", 2),
         reason: QuarantineReason::FailedUpgrade,
     }
 }
 
-fn round_trip_request(operation: Operation) -> Operation {
-    let frame = Frame::new(FrameBody::Request {
-        exchange: exchange(),
-        request: operation.clone().into_request(),
-    });
+fn round_trip_input(input: Input) -> Input {
+    let frame = input.clone().into_frame(exchange());
     let bytes = frame.encode_length_prefixed().expect("encode");
     let decoded = Frame::decode_length_prefixed(&bytes).expect("decode");
     match decoded.into_body() {
@@ -108,11 +117,8 @@ fn round_trip_request(operation: Operation) -> Operation {
     }
 }
 
-fn round_trip_reply(reply: Reply) -> Reply {
-    let frame = Frame::new(FrameBody::Reply {
-        exchange: exchange(),
-        reply: FrameReply::committed(NonEmpty::single(SubReply::Ok(reply.clone()))),
-    });
+fn round_trip_output(output: Output) -> Output {
+    let frame = output.clone().into_reply_frame(exchange());
     let bytes = frame.encode_length_prefixed().expect("encode");
     let decoded = Frame::decode_length_prefixed(&bytes).expect("decode");
     match decoded.into_body() {
@@ -150,160 +156,159 @@ where
 
 #[test]
 fn catalogue_meta_requests_round_trip_through_signal_frames() {
-    let operations = [
-        Operation::Register(registration()),
-        Operation::Allow(range()),
-        Operation::Block(Block {
-            component: catalogue_component(),
+    let inputs = [
+        Input::register(registration()),
+        Input::allow(range()),
+        Input::block(Block {
+            component: component(),
             source: source(),
-            target: MigrationVersion::new(0, 1, 2),
+            target: MigrationVersion {
+                major: 0,
+                minor: 1,
+                patch: 2,
+            },
             reason: BlockReason::Unsafe,
         }),
-        Operation::Query(Query::All),
+        Input::query(Query::All),
     ];
 
-    for operation in operations {
-        assert_eq!(round_trip_request(operation.clone()), operation);
+    for input in inputs {
+        assert_eq!(round_trip_input(input.clone()), input);
     }
 }
 
 #[test]
 fn selector_meta_requests_round_trip_through_signal_frames() {
-    let operations = [
-        Operation::ForceFlip(force_flip()),
-        Operation::Rollback(rollback()),
-        Operation::Quarantine(quarantine()),
+    let inputs = [
+        Input::force_flip(force_flip()),
+        Input::rollback(rollback()),
+        Input::quarantine(quarantine()),
     ];
 
-    for operation in operations {
-        assert_eq!(round_trip_request(operation.clone()), operation);
+    for input in inputs {
+        assert_eq!(round_trip_input(input.clone()), input);
     }
 }
 
 #[test]
 fn meta_replies_round_trip_through_signal_frames() {
-    let replies = [
-        Reply::Registered(registration()),
-        Reply::Allowed(range()),
-        Reply::Blocked(Block {
-            component: catalogue_component(),
+    let outputs = [
+        Output::registered(registration()),
+        Output::allowed(range()),
+        Output::blocked(Block {
+            component: component(),
             source: source(),
-            target: MigrationVersion::new(0, 1, 2),
+            target: MigrationVersion {
+                major: 0,
+                minor: 1,
+                patch: 2,
+            },
             reason: BlockReason::Unsafe,
         }),
-        Reply::PolicyReported(PolicyReported {
-            entries: vec![PolicyEntry {
-                component: catalogue_component(),
-                source: source(),
-                target: target(),
-                state: MigrationState::Enabled,
-            }],
-        }),
-        Reply::PolicyRejected(PolicyRejected {
-            component: catalogue_component(),
+        Output::policy_reported(vec![PolicyEntry {
+            component: component(),
+            source: source(),
+            target: target(),
+            state: MigrationState::Enabled,
+        }]),
+        Output::policy_rejected(PolicyRejected {
+            component: component(),
             source: source(),
             target: target(),
             reason: CatalogueRejectionReason::UnknownMigration,
         }),
-        Reply::FlipForced(ForcedFlip {
-            component: projection_component(),
+        Output::flip_forced(ForcedFlip {
+            component: component(),
             active_version: selector_version("v0.1.1", 2),
         }),
-        Reply::RolledBack(RolledBack {
-            component: projection_component(),
+        Output::rolled_back(RolledBack {
+            component: component(),
             active_version: selector_version("v0.1.0", 1),
         }),
-        Reply::Quarantined(Quarantined {
-            component: projection_component(),
+        Output::quarantined(Quarantined {
+            component: component(),
             version: selector_version("v0.1.1", 2),
         }),
-        Reply::Rejected(Rejected {
-            component: projection_component(),
+        Output::rejected(Rejected {
+            component: component(),
             reason: SelectorRejectionReason::AlreadyQuarantined,
         }),
-        Reply::RequestUnimplemented(RequestUnimplemented {
-            reason: UnimplementedReason::NotBuiltYet,
-        }),
+        Output::request_unimplemented(UnimplementedReason::NotBuiltYet),
     ];
 
-    for reply in replies {
-        assert_eq!(round_trip_reply(reply.clone()), reply);
+    for output in outputs {
+        assert_eq!(round_trip_output(output.clone()), output);
     }
 }
 
 #[test]
-fn operation_kinds_are_generated_without_attempt_handover() {
+fn generated_routes_are_closed_and_attempt_handover_is_absent() {
     assert_eq!(
-        Operation::Register(registration()).kind(),
-        OperationKind::Register
+        Input::register(registration()).route(),
+        InputRoute::Register
     );
     assert_eq!(
-        Operation::ForceFlip(force_flip()).kind(),
-        OperationKind::ForceFlip
+        Input::force_flip(force_flip()).route(),
+        InputRoute::ForceFlip
+    );
+    assert_eq!(Input::rollback(rollback()).route(), InputRoute::Rollback);
+    assert_eq!(
+        Input::quarantine(quarantine()).route(),
+        InputRoute::Quarantine
     );
     assert_eq!(
-        Operation::Rollback(rollback()).kind(),
-        OperationKind::Rollback
-    );
-    assert_eq!(
-        Operation::Quarantine(quarantine()).kind(),
-        OperationKind::Quarantine
+        Output::request_unimplemented(UnimplementedReason::NotBuiltYet).route(),
+        OutputRoute::RequestUnimplemented
     );
 }
 
 #[test]
-#[cfg(feature = "nota-text")]
-fn effect_event_uses_contract_owned_outcome_not_sema_observation() {
-    let event = EffectEmitted {
-        operation: OperationKind::ForceFlip,
-        outcome: EffectOutcome::FlipForced,
-    };
-
-    let encoded = encode(&event);
-    assert_eq!(encoded, "(ForceFlip FlipForced)");
-    assert!(!encoded.contains("Sema"));
-
-    let recovered = NotaSource::new(&encoded)
-        .parse::<EffectEmitted>()
-        .expect("decode event");
-    assert_eq!(recovered, event);
+fn generated_wire_contract_exposes_signal_frame_request_heads() {
+    assert!(<Input as SignalOperationHeads>::contains_head("Register"));
+    assert!(<Input as SignalOperationHeads>::contains_head("ForceFlip"));
+    assert!(<Input as SignalOperationHeads>::contains_head("Quarantine"));
+    assert!(!<Input as SignalOperationHeads>::contains_head(
+        "AttemptHandover"
+    ));
 }
 
 #[test]
 #[cfg(feature = "nota-text")]
 fn catalogue_canonical_nota_examples_round_trip() {
     round_trip_nota(
-        Operation::Register(registration()),
+        Input::register(registration()),
         "(Register ([persona-spirit] (0 1 0) (0 1 1) [persona-spirit-0-1-0-to-0-1-1] Enabled))",
     );
     round_trip_nota(
-        Operation::Allow(range()),
+        Input::allow(range()),
         "(Allow ([persona-spirit] (0 1 0) (0 1 1)))",
     );
     round_trip_nota(
-        Operation::Block(Block {
-            component: catalogue_component(),
+        Input::block(Block {
+            component: component(),
             source: source(),
-            target: MigrationVersion::new(0, 1, 2),
+            target: MigrationVersion {
+                major: 0,
+                minor: 1,
+                patch: 2,
+            },
             reason: BlockReason::Unsafe,
         }),
         "(Block ([persona-spirit] (0 1 0) (0 1 2) Unsafe))",
     );
-    round_trip_nota(Operation::Query(Query::All), "(Query All)");
+    round_trip_nota(Input::query(Query::All), "(Query All)");
     round_trip_nota(
-        Reply::Registered(registration()),
+        Output::registered(registration()),
         "(Registered ([persona-spirit] (0 1 0) (0 1 1) [persona-spirit-0-1-0-to-0-1-1] Enabled))",
     );
     round_trip_nota(
-        Reply::PolicyReported(PolicyReported {
-            entries: vec![PolicyEntry {
-                component: catalogue_component(),
-                source: source(),
-                target: target(),
-                state: MigrationState::Enabled,
-            }],
-        }),
-        "(PolicyReported ([([persona-spirit] (0 1 0) (0 1 1) Enabled)]))",
+        Output::policy_reported(vec![PolicyEntry {
+            component: component(),
+            source: source(),
+            target: target(),
+            state: MigrationState::Enabled,
+        }]),
+        "(PolicyReported [([persona-spirit] (0 1 0) (0 1 1) Enabled)])",
     );
 }
 
@@ -311,35 +316,33 @@ fn catalogue_canonical_nota_examples_round_trip() {
 #[cfg(feature = "nota-text")]
 fn selector_canonical_nota_examples_round_trip() {
     round_trip_nota(
-        Operation::ForceFlip(force_flip()),
-        "(ForceFlip (persona-spirit ([v0.1.0] #0101010101010101010101010101010101010101010101010101010101010101) ([v0.1.1] #0202020202020202020202020202020202020202020202020202020202020202) OperatorOverride))",
+        Input::force_flip(force_flip()),
+        "(ForceFlip ([persona-spirit] ([v0.1.0] [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]) ([v0.1.1] [2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2]) OperatorOverride))",
     );
     round_trip_nota(
-        Operation::Rollback(rollback()),
-        "(Rollback (persona-spirit ([v0.1.1] #0202020202020202020202020202020202020202020202020202020202020202) ([v0.1.0] #0101010101010101010101010101010101010101010101010101010101010101) PostCutoverFailure))",
+        Input::rollback(rollback()),
+        "(Rollback ([persona-spirit] ([v0.1.1] [2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2]) ([v0.1.0] [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]) PostCutoverFailure))",
     );
     round_trip_nota(
-        Operation::Quarantine(quarantine()),
-        "(Quarantine (persona-spirit ([v0.1.1] #0202020202020202020202020202020202020202020202020202020202020202) FailedUpgrade))",
+        Input::quarantine(quarantine()),
+        "(Quarantine ([persona-spirit] ([v0.1.1] [2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2]) FailedUpgrade))",
     );
     round_trip_nota(
-        Reply::FlipForced(ForcedFlip {
-            component: projection_component(),
+        Output::flip_forced(ForcedFlip {
+            component: component(),
             active_version: selector_version("v0.1.1", 2),
         }),
-        "(FlipForced (persona-spirit ([v0.1.1] #0202020202020202020202020202020202020202020202020202020202020202)))",
+        "(FlipForced ([persona-spirit] ([v0.1.1] [2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2])))",
     );
     round_trip_nota(
-        Reply::Rejected(Rejected {
-            component: projection_component(),
+        Output::rejected(Rejected {
+            component: component(),
             reason: SelectorRejectionReason::AlreadyQuarantined,
         }),
-        "(Rejected (persona-spirit AlreadyQuarantined))",
+        "(Rejected ([persona-spirit] AlreadyQuarantined))",
     );
     round_trip_nota(
-        Reply::RequestUnimplemented(RequestUnimplemented {
-            reason: UnimplementedReason::NotBuiltYet,
-        }),
-        "(RequestUnimplemented (NotBuiltYet))",
+        Output::request_unimplemented(UnimplementedReason::NotBuiltYet),
+        "(RequestUnimplemented NotBuiltYet)",
     );
 }
