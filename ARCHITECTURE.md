@@ -30,6 +30,9 @@ so peers call `AttemptUpgrade` on the ordinary `signal-upgrade` contract.
 meta authority configures the policy that permits or blocks those attempts
 and keeps emergency selector controls available.
 
+The old `owner-signal-sema-upgrade` prototype is archived. Its catalogue-policy
+role is merged here rather than preserved as a separate meta-signal repo.
+
 ## Code Map
 
 - `schema/lib.schema` declares the first real schema-next source for

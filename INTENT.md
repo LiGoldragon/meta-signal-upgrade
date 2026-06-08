@@ -36,6 +36,10 @@ attempts and keeps emergency selector controls available. Catalogue policy recor
 reuse `ComponentName`, `MigrationIdentifier`, and migration `Version` from
 `signal-upgrade`.
 
+The old `owner-signal-sema-upgrade` prototype is archived. Its
+catalogue-policy role is merged into this meta-signal contract rather than
+renamed into a separate `meta-signal-sema-upgrade` repository.
+
 ## Constraints
 
 - Meta-policy operations live here because caller authority, not touched state,
