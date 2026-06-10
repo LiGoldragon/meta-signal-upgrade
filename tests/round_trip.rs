@@ -25,7 +25,7 @@ fn exchange() -> ExchangeIdentifier {
 }
 
 fn component() -> ComponentName {
-    String::from("persona-spirit")
+    ComponentName::new("persona-spirit")
 }
 
 fn source() -> MigrationVersion {
@@ -45,7 +45,7 @@ fn target() -> MigrationVersion {
 }
 
 fn migration_identifier() -> MigrationIdentifier {
-    String::from("persona-spirit-0-1-0-to-0-1-1")
+    MigrationIdentifier::new("persona-spirit-0-1-0-to-0-1-1")
 }
 
 fn registration() -> Registration {
@@ -71,7 +71,7 @@ fn contract_version(byte: u64) -> ContractVersion {
 }
 
 fn version_label(value: &str) -> VersionLabel {
-    String::from(value)
+    VersionLabel::new(value)
 }
 
 fn selector_version(label: &str, byte: u64) -> SelectorVersion {
@@ -277,11 +277,11 @@ fn generated_wire_contract_exposes_signal_frame_request_heads() {
 fn catalogue_canonical_nota_examples_round_trip() {
     round_trip_nota(
         Input::register(registration()),
-        "(Register ([persona-spirit] (0 1 0) (0 1 1) [persona-spirit-0-1-0-to-0-1-1] Enabled))",
+        "(Register (persona-spirit (0 1 0) (0 1 1) persona-spirit-0-1-0-to-0-1-1 Enabled))",
     );
     round_trip_nota(
         Input::allow(range()),
-        "(Allow ([persona-spirit] (0 1 0) (0 1 1)))",
+        "(Allow (persona-spirit (0 1 0) (0 1 1)))",
     );
     round_trip_nota(
         Input::block(Block {
@@ -294,12 +294,12 @@ fn catalogue_canonical_nota_examples_round_trip() {
             },
             reason: BlockReason::Unsafe,
         }),
-        "(Block ([persona-spirit] (0 1 0) (0 1 2) Unsafe))",
+        "(Block (persona-spirit (0 1 0) (0 1 2) Unsafe))",
     );
     round_trip_nota(Input::query(Query::All), "(Query All)");
     round_trip_nota(
         Output::registered(registration()),
-        "(Registered ([persona-spirit] (0 1 0) (0 1 1) [persona-spirit-0-1-0-to-0-1-1] Enabled))",
+        "(Registered (persona-spirit (0 1 0) (0 1 1) persona-spirit-0-1-0-to-0-1-1 Enabled))",
     );
     round_trip_nota(
         Output::policy_reported(vec![PolicyEntry {
@@ -308,7 +308,7 @@ fn catalogue_canonical_nota_examples_round_trip() {
             target: target(),
             state: MigrationState::Enabled,
         }]),
-        "(PolicyReported [([persona-spirit] (0 1 0) (0 1 1) Enabled)])",
+        "(PolicyReported [(persona-spirit (0 1 0) (0 1 1) Enabled)])",
     );
 }
 
@@ -317,29 +317,29 @@ fn catalogue_canonical_nota_examples_round_trip() {
 fn selector_canonical_nota_examples_round_trip() {
     round_trip_nota(
         Input::force_flip(force_flip()),
-        "(ForceFlip ([persona-spirit] ([v0.1.0] [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]) ([v0.1.1] [2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2]) OperatorOverride))",
+        "(ForceFlip (persona-spirit (v0.1.0 [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]) (v0.1.1 [2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2]) OperatorOverride))",
     );
     round_trip_nota(
         Input::rollback(rollback()),
-        "(Rollback ([persona-spirit] ([v0.1.1] [2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2]) ([v0.1.0] [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]) PostCutoverFailure))",
+        "(Rollback (persona-spirit (v0.1.1 [2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2]) (v0.1.0 [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]) PostCutoverFailure))",
     );
     round_trip_nota(
         Input::quarantine(quarantine()),
-        "(Quarantine ([persona-spirit] ([v0.1.1] [2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2]) FailedUpgrade))",
+        "(Quarantine (persona-spirit (v0.1.1 [2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2]) FailedUpgrade))",
     );
     round_trip_nota(
         Output::flip_forced(ForcedFlip {
             component: component(),
             active_version: selector_version("v0.1.1", 2),
         }),
-        "(FlipForced ([persona-spirit] ([v0.1.1] [2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2])))",
+        "(FlipForced (persona-spirit (v0.1.1 [2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2])))",
     );
     round_trip_nota(
         Output::rejected(Rejected {
             component: component(),
             reason: SelectorRejectionReason::AlreadyQuarantined,
         }),
-        "(Rejected ([persona-spirit] AlreadyQuarantined))",
+        "(Rejected (persona-spirit AlreadyQuarantined))",
     );
     round_trip_nota(
         Output::request_unimplemented(UnimplementedReason::NotBuiltYet),

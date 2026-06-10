@@ -8,7 +8,7 @@ const SCHEMA_SOURCE: &str = include_str!("../schema/lib.schema");
 const GENERATED_SCHEMA_RUST: &str = include_str!("../src/schema/lib.rs");
 
 fn version_label(value: &str) -> VersionLabel {
-    String::from(value)
+    VersionLabel::new(value)
 }
 
 fn contract_version(byte: u64) -> ContractVersion {
@@ -24,7 +24,7 @@ fn selector_version(label: &str, byte: u64) -> SelectorVersion {
 
 fn range() -> PolicyRange {
     PolicyRange {
-        component: ComponentName::from("persona-spirit"),
+        component: ComponentName::new("persona-spirit"),
         source: meta_signal_upgrade::schema::lib::MigrationVersion {
             major: 0,
             minor: 1,
@@ -40,7 +40,7 @@ fn range() -> PolicyRange {
 
 fn force_flip() -> ForceFlip {
     ForceFlip {
-        component: ComponentName::from("persona-spirit"),
+        component: ComponentName::new("persona-spirit"),
         current_version: selector_version("v0.1.0", 1),
         target_version: selector_version("v0.1.1", 2),
         reason: ForceReason::OperatorOverride,
@@ -63,7 +63,7 @@ fn generated_meta_input_owns_short_header_and_frame() {
 #[test]
 fn generated_meta_output_owns_short_header_and_frame() {
     let output = Output::blocked(Block {
-        component: ComponentName::from("persona-spirit"),
+        component: ComponentName::new("persona-spirit"),
         source: range().source,
         target: range().target,
         reason: BlockReason::Unsafe,

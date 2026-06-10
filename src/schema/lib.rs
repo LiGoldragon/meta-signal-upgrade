@@ -14,15 +14,19 @@ pub type Path = std::string::String;
 pub use nota_next::{NotaDecode, NotaDecodeError, NotaEncode, NotaSource};
 
 #[rustfmt::skip]
-pub type ComponentName = String;
-
-#[rustfmt::skip]
-pub type MigrationIdentifier = String;
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct ComponentName(String);
 
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct ContractVersion(pub Vec<Integer>);
+pub struct MigrationIdentifier(String);
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct ContractVersion(Vec<Integer>);
 
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
@@ -119,7 +123,7 @@ pub struct PolicyEntry {
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct PolicyReported(pub Vec<PolicyEntry>);
+pub struct PolicyReported(Vec<PolicyEntry>);
 
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
@@ -150,7 +154,9 @@ pub struct PolicyRejected {
 }
 
 #[rustfmt::skip]
-pub type VersionLabel = String;
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct VersionLabel(String);
 
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
@@ -318,7 +324,7 @@ pub enum UnimplementedReason {
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct RequestUnimplemented(pub UnimplementedReason);
+pub struct RequestUnimplemented(UnimplementedReason);
 
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
@@ -347,6 +353,44 @@ pub enum Output {
     Quarantined(Quarantined),
     Rejected(Rejected),
     RequestUnimplemented(RequestUnimplemented),
+}
+
+#[rustfmt::skip]
+impl ComponentName {
+    pub fn new(payload: impl Into<String>) -> Self {
+        Self(payload.into())
+    }
+    pub fn payload(&self) -> &String {
+        &self.0
+    }
+    pub fn into_payload(self) -> String {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<String> for ComponentName {
+    fn from(payload: String) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl MigrationIdentifier {
+    pub fn new(payload: impl Into<String>) -> Self {
+        Self(payload.into())
+    }
+    pub fn payload(&self) -> &String {
+        &self.0
+    }
+    pub fn into_payload(self) -> String {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<String> for MigrationIdentifier {
+    fn from(payload: String) -> Self {
+        Self::new(payload)
+    }
 }
 
 #[rustfmt::skip]
@@ -388,6 +432,25 @@ impl From<Vec<PolicyEntry>> for PolicyReported {
 }
 
 #[rustfmt::skip]
+impl VersionLabel {
+    pub fn new(payload: impl Into<String>) -> Self {
+        Self(payload.into())
+    }
+    pub fn payload(&self) -> &String {
+        &self.0
+    }
+    pub fn into_payload(self) -> String {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<String> for VersionLabel {
+    fn from(payload: String) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
 impl RequestUnimplemented {
     pub fn new(payload: UnimplementedReason) -> Self {
         Self(payload)
@@ -408,8 +471,8 @@ impl From<UnimplementedReason> for RequestUnimplemented {
 
 #[rustfmt::skip]
 impl Query {
-    pub fn component(payload: ComponentName) -> Self {
-        Self::Component(payload)
+    pub fn component(payload: String) -> Self {
+        Self::Component(ComponentName::new(payload))
     }
 }
 
@@ -469,6 +532,13 @@ impl Output {
     }
     pub fn request_unimplemented(payload: UnimplementedReason) -> Self {
         Self::RequestUnimplemented(RequestUnimplemented::new(payload))
+    }
+}
+
+#[rustfmt::skip]
+impl From<ComponentName> for Query {
+    fn from(payload: ComponentName) -> Self {
+        Self::Component(payload)
     }
 }
 
@@ -588,6 +658,28 @@ impl From<Rejected> for Output {
 impl From<RequestUnimplemented> for Output {
     fn from(payload: RequestUnimplemented) -> Self {
         Self::RequestUnimplemented(payload)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl ComponentName {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl MigrationIdentifier {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
     }
 }
 
@@ -715,6 +807,17 @@ impl CatalogueRejectionReason {
 #[rustfmt::skip]
 #[cfg(feature = "nota-text")]
 impl PolicyRejected {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl VersionLabel {
     pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
         <Self as NotaDecode>::from_nota_block(block)
     }
