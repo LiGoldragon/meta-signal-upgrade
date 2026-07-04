@@ -34,7 +34,7 @@ fn nota_text_feature_is_the_text_codec_boundary() {
     assert!(output.status.success(), "status: {:?}", output.status);
     let tree = String::from_utf8(output.stdout).expect("cargo tree output");
     assert!(
-        tree.contains("nota-next"),
-        "nota-text feature should pull nota-next:\n{tree}"
+        tree.contains("nota"),
+        "nota-text feature should pull nota:\n{tree}"
     );
 }
