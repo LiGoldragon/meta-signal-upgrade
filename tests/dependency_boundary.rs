@@ -9,7 +9,7 @@ fn default_dependency_tree_is_binary_only() {
 
     assert!(output.status.success(), "status: {:?}", output.status);
     let tree = String::from_utf8(output.stdout).expect("cargo tree output");
-    for forbidden in ["nota-next", "nota-codec", "signal-core"] {
+    for forbidden in ["nota", "nota-codec", "signal-core"] {
         assert!(
             !tree.contains(forbidden),
             "default dependency tree unexpectedly contains {forbidden}:\n{tree}"
