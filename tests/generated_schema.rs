@@ -17,14 +17,14 @@ fn contract_version(byte: u64) -> ContractVersion {
 
 fn selector_version(label: &str, byte: u64) -> SelectorVersion {
     SelectorVersion {
-        label: version_label(label),
+        version_label: version_label(label),
         contract_version: contract_version(byte),
     }
 }
 
 fn range() -> PolicyRange {
     PolicyRange {
-        component: ComponentName::new("persona-spirit"),
+        component_name: ComponentName::new("persona-spirit"),
         source: meta_signal_upgrade::schema::lib::MigrationVersion {
             major: 0,
             minor: 1,
@@ -40,10 +40,10 @@ fn range() -> PolicyRange {
 
 fn force_flip() -> ForceFlip {
     ForceFlip {
-        component: ComponentName::new("persona-spirit"),
-        current_version: selector_version("v0.1.0", 1),
-        target_version: selector_version("v0.1.1", 2),
-        reason: ForceReason::OperatorOverride,
+        component_name: ComponentName::new("persona-spirit"),
+        current: selector_version("v0.1.0", 1),
+        target: selector_version("v0.1.1", 2),
+        force_reason: ForceReason::OperatorOverride,
     }
 }
 
@@ -63,10 +63,10 @@ fn generated_meta_input_owns_short_header_and_frame() {
 #[test]
 fn generated_meta_output_owns_short_header_and_frame() {
     let output = Output::blocked(Block {
-        component: ComponentName::new("persona-spirit"),
+        component_name: ComponentName::new("persona-spirit"),
         source: range().source,
         target: range().target,
-        reason: BlockReason::Unsafe,
+        block_reason: BlockReason::Unsafe,
     });
 
     assert_eq!(output.route(), OutputRoute::Blocked);
@@ -78,7 +78,7 @@ fn generated_meta_output_owns_short_header_and_frame() {
 
     assert_eq!(route, OutputRoute::Blocked);
     match decoded {
-        Output::Blocked(block) => assert_eq!(block.reason, BlockReason::Unsafe),
+        Output::Blocked(block) => assert_eq!(block.block_reason, BlockReason::Unsafe),
         other => panic!("expected Blocked output, got {other:?}"),
     }
 }

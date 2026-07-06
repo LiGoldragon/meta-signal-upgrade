@@ -15,22 +15,21 @@ path = "src/lib.rs"
 [features]
 default = []
 nota-text = [
-    "dep:nota-next",
+    "dep:nota",
     "signal-frame/nota-text",
 ]
 
 [dependencies]
-nota-next        = { git = "https://github.com/LiGoldragon/nota-next.git", branch = "main", optional = true }
-rkyv              = { version = "0.8", default-features = false, features = ["std", "bytecheck", "little_endian", "pointer_width_32", "unaligned"] }
-signal-frame      = { git = "https://github.com/LiGoldragon/signal-frame.git", branch = "main", default-features = false }
-thiserror         = "2"
+nota         = { package = "nota", git = "https://github.com/LiGoldragon/nota-next.git", branch = "main", optional = true }
+rkyv         = { version = "0.8", default-features = false, features = ["std", "bytecheck", "little_endian", "pointer_width_32", "unaligned"] }
+signal-frame = { git = "https://github.com/LiGoldragon/signal-frame.git", branch = "main", default-features = false }
+thiserror    = "2"
 
 [dev-dependencies]
-nota-next        = { git = "https://github.com/LiGoldragon/nota-next.git", branch = "main" }
+nota = { package = "nota", git = "https://github.com/LiGoldragon/nota-next.git", branch = "main" }
 
 [build-dependencies]
-schema-next = { git = "https://github.com/LiGoldragon/schema-next.git", branch = "main" }
-schema-rust-next = { git = "https://github.com/LiGoldragon/schema-rust-next.git", branch = "main" }
+schema-rust = { package = "schema-rust", git = "https://github.com/LiGoldragon/schema-rust.git", rev = "886a9009077bdf9ee0e71fa0fa31aaf6e5444dd3" }
 
 [lints.rust]
 unsafe_code = "forbid"

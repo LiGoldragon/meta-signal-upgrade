@@ -7,7 +7,7 @@ use meta_signal_upgrade::{
     UnimplementedReason, VersionLabel,
 };
 #[cfg(feature = "nota-text")]
-use nota_next::{NotaDecode, NotaEncode, NotaSource};
+use nota::{NotaDecode, NotaEncode, NotaSource};
 use signal_frame::{
     ExchangeIdentifier, ExchangeLane, LaneSequence, Reply as FrameReply, SessionEpoch,
     SignalOperationHeads, SubReply,
@@ -50,17 +50,17 @@ fn migration_identifier() -> MigrationIdentifier {
 
 fn registration() -> Registration {
     Registration {
-        component: component(),
+        component_name: component(),
         source: source(),
         target: target(),
-        migration: migration_identifier(),
-        state: MigrationState::Enabled,
+        migration_identifier: migration_identifier(),
+        migration_state: MigrationState::Enabled,
     }
 }
 
 fn range() -> PolicyRange {
     PolicyRange {
-        component: component(),
+        component_name: component(),
         source: source(),
         target: target(),
     }
@@ -76,34 +76,34 @@ fn version_label(value: &str) -> VersionLabel {
 
 fn selector_version(label: &str, byte: u64) -> SelectorVersion {
     SelectorVersion {
-        label: version_label(label),
+        version_label: version_label(label),
         contract_version: contract_version(byte),
     }
 }
 
 fn force_flip() -> ForceFlip {
     ForceFlip {
-        component: component(),
-        current_version: selector_version("v0.1.0", 1),
-        target_version: selector_version("v0.1.1", 2),
-        reason: ForceReason::OperatorOverride,
+        component_name: component(),
+        current: selector_version("v0.1.0", 1),
+        target: selector_version("v0.1.1", 2),
+        force_reason: ForceReason::OperatorOverride,
     }
 }
 
 fn rollback() -> Rollback {
     Rollback {
-        component: component(),
-        active_version: selector_version("v0.1.1", 2),
-        restore_version: selector_version("v0.1.0", 1),
-        reason: RollbackReason::PostCutoverFailure,
+        component_name: component(),
+        active: selector_version("v0.1.1", 2),
+        restore: selector_version("v0.1.0", 1),
+        rollback_reason: RollbackReason::PostCutoverFailure,
     }
 }
 
 fn quarantine() -> Quarantine {
     Quarantine {
-        component: component(),
-        version: selector_version("v0.1.1", 2),
-        reason: QuarantineReason::FailedUpgrade,
+        component_name: component(),
+        selector_version: selector_version("v0.1.1", 2),
+        quarantine_reason: QuarantineReason::FailedUpgrade,
     }
 }
 
@@ -160,14 +160,14 @@ fn catalogue_meta_requests_round_trip_through_signal_frames() {
         Input::register(registration()),
         Input::allow(range()),
         Input::block(Block {
-            component: component(),
+            component_name: component(),
             source: source(),
             target: MigrationVersion {
                 major: 0,
                 minor: 1,
                 patch: 2,
             },
-            reason: BlockReason::Unsafe,
+            block_reason: BlockReason::Unsafe,
         }),
         Input::query(Query::All),
     ];
@@ -196,42 +196,42 @@ fn meta_replies_round_trip_through_signal_frames() {
         Output::registered(registration()),
         Output::allowed(range()),
         Output::blocked(Block {
-            component: component(),
+            component_name: component(),
             source: source(),
             target: MigrationVersion {
                 major: 0,
                 minor: 1,
                 patch: 2,
             },
-            reason: BlockReason::Unsafe,
+            block_reason: BlockReason::Unsafe,
         }),
         Output::policy_reported(vec![PolicyEntry {
-            component: component(),
+            component_name: component(),
             source: source(),
             target: target(),
-            state: MigrationState::Enabled,
+            migration_state: MigrationState::Enabled,
         }]),
         Output::policy_rejected(PolicyRejected {
-            component: component(),
+            component_name: component(),
             source: source(),
             target: target(),
-            reason: CatalogueRejectionReason::UnknownMigration,
+            catalogue_rejection_reason: CatalogueRejectionReason::UnknownMigration,
         }),
         Output::flip_forced(ForcedFlip {
-            component: component(),
-            active_version: selector_version("v0.1.1", 2),
+            component_name: component(),
+            selector_version: selector_version("v0.1.1", 2),
         }),
         Output::rolled_back(RolledBack {
-            component: component(),
-            active_version: selector_version("v0.1.0", 1),
+            component_name: component(),
+            selector_version: selector_version("v0.1.0", 1),
         }),
         Output::quarantined(Quarantined {
-            component: component(),
-            version: selector_version("v0.1.1", 2),
+            component_name: component(),
+            selector_version: selector_version("v0.1.1", 2),
         }),
         Output::rejected(Rejected {
-            component: component(),
-            reason: SelectorRejectionReason::AlreadyQuarantined,
+            component_name: component(),
+            selector_rejection_reason: SelectorRejectionReason::AlreadyQuarantined,
         }),
         Output::request_unimplemented(UnimplementedReason::NotBuiltYet),
     ];
@@ -285,14 +285,14 @@ fn catalogue_canonical_nota_examples_round_trip() {
     );
     round_trip_nota(
         Input::block(Block {
-            component: component(),
+            component_name: component(),
             source: source(),
             target: MigrationVersion {
                 major: 0,
                 minor: 1,
                 patch: 2,
             },
-            reason: BlockReason::Unsafe,
+            block_reason: BlockReason::Unsafe,
         }),
         "(Block (persona-spirit (0 1 0) (0 1 2) Unsafe))",
     );
@@ -303,10 +303,10 @@ fn catalogue_canonical_nota_examples_round_trip() {
     );
     round_trip_nota(
         Output::policy_reported(vec![PolicyEntry {
-            component: component(),
+            component_name: component(),
             source: source(),
             target: target(),
-            state: MigrationState::Enabled,
+            migration_state: MigrationState::Enabled,
         }]),
         "(PolicyReported [(persona-spirit (0 1 0) (0 1 1) Enabled)])",
     );
@@ -329,15 +329,15 @@ fn selector_canonical_nota_examples_round_trip() {
     );
     round_trip_nota(
         Output::flip_forced(ForcedFlip {
-            component: component(),
-            active_version: selector_version("v0.1.1", 2),
+            component_name: component(),
+            selector_version: selector_version("v0.1.1", 2),
         }),
         "(FlipForced (persona-spirit (v0.1.1 [2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2])))",
     );
     round_trip_nota(
         Output::rejected(Rejected {
-            component: component(),
-            reason: SelectorRejectionReason::AlreadyQuarantined,
+            component_name: component(),
+            selector_rejection_reason: SelectorRejectionReason::AlreadyQuarantined,
         }),
         "(Rejected (persona-spirit AlreadyQuarantined))",
     );
