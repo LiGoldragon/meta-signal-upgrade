@@ -35,20 +35,19 @@ role is merged here rather than preserved as a separate meta-signal repo.
 
 ## Code Map
 
-- `schema/lib.schema` declares the first real schema source for
-  the meta-policy upgrade meta-signal surface and its generated
-  wire-only Input/Output roots.
+- `schema/lib.schema` declares the TrueSchema source for the meta-policy
+  upgrade meta-signal surface and its generated wire-only Input/Output roots.
 - `src/schema/lib.rs` is the checked-in generated Rust interface;
-  `build.rs` deserializes `schema/lib.schema` into `SchemaSource`,
-  validates the schema-in-Rust value through text and rkyv round-trips,
-  and fails the build when the generated Rust is stale.
+  `build.rs` deserializes `schema/lib.schema` through the TrueSchema build
+  driver, validates source text and rkyv round-trips, and fails the build when
+  the generated Rust is stale.
 - `src/lib.rs` re-exports the generated schema module as the crate's
   public contract API.
 - `tests/round_trip.rs` proves the merged meta channel round-trips through
   Signal frames in default mode and through NOTA under `nota-text`.
 - `tests/dependency_boundary.rs` pins the feature boundary: default builds
-  do not pull `nota`, `nota-codec`, or `signal-core`; `nota-text` is
-  the explicit text-codec opt-in.
+  do not pull `nota`, `nota-codec`, or `signal-core`; `nota-text` is the
+  explicit text-codec opt-in.
 - `tests/generated_schema.rs` exercises generated Input/Output
   short-header/frame round-trips and guards against generated
   Nexus/SEMA runtime terms, trace/mail helpers, and generic plane
@@ -61,8 +60,8 @@ role is merged here rather than preserved as a separate meta-signal repo.
   state, determines the contract split.
 - The contract crate carries no daemon, actor, database, or Tokio
   runtime code.
-- The generated schema module is emitted with `schema-rust`
-  `WireContract` target, so it carries wire types/codecs only.
+- The generated schema module is emitted with `schema-rust` in wire-contract
+  mode, so it carries wire types/codecs only.
 - NOTA parsing/rendering is feature-gated under `nota-text`; the default
   contract graph is binary-only for daemon consumers.
 - The meta-signal and ordinary contracts remain separate repositories.
@@ -74,9 +73,8 @@ role is merged here rather than preserved as a separate meta-signal repo.
 **Status:** migrated. The crate's public API is emitted from
 `schema/lib.schema`; there is no parallel hand-written channel surface.
 
-`schema-rust` emits the wire types, short-header projection,
-request/reply frame aliases, and binary codecs. It does not emit daemon
-runtime planes here.
+`schema-rust` emits the wire types, short-header projection, request/reply
+frame aliases, and binary codecs. It does not emit daemon runtime planes here.
 
 **Per-component concerns:**
 - Merged meta-signal contract per /318: catalogue policy (`Register`,

@@ -76,11 +76,11 @@ pub enum MigrationState {
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct Registration {
-    pub component: ComponentName,
+    pub component_name: ComponentName,
     pub source: MigrationVersion,
     pub target: MigrationVersion,
-    pub migration: MigrationIdentifier,
-    pub state: MigrationState,
+    pub migration_identifier: MigrationIdentifier,
+    pub migration_state: MigrationState,
 }
 
 #[rustfmt::skip]
@@ -90,7 +90,7 @@ pub struct Registration {
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct PolicyRange {
-    pub component: ComponentName,
+    pub component_name: ComponentName,
     pub source: MigrationVersion,
     pub target: MigrationVersion,
 }
@@ -123,10 +123,10 @@ pub enum BlockReason {
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct Block {
-    pub component: ComponentName,
+    pub component_name: ComponentName,
     pub source: MigrationVersion,
     pub target: MigrationVersion,
-    pub reason: BlockReason,
+    pub block_reason: BlockReason,
 }
 
 #[rustfmt::skip]
@@ -147,10 +147,10 @@ pub enum Query {
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct PolicyEntry {
-    pub component: ComponentName,
+    pub component_name: ComponentName,
     pub source: MigrationVersion,
     pub target: MigrationVersion,
-    pub state: MigrationState,
+    pub migration_state: MigrationState,
 }
 
 #[rustfmt::skip]
@@ -189,10 +189,10 @@ pub enum CatalogueRejectionReason {
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct PolicyRejected {
-    pub component: ComponentName,
+    pub component_name: ComponentName,
     pub source: MigrationVersion,
     pub target: MigrationVersion,
-    pub reason: CatalogueRejectionReason,
+    pub catalogue_rejection_reason: CatalogueRejectionReason,
 }
 
 #[rustfmt::skip]
@@ -210,7 +210,7 @@ pub struct VersionLabel(String);
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct SelectorVersion {
-    pub label: VersionLabel,
+    pub version_label: VersionLabel,
     pub contract_version: ContractVersion,
 }
 
@@ -284,10 +284,10 @@ pub enum QuarantineReason {
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct ForceFlip {
-    pub component: ComponentName,
-    pub current_version: SelectorVersion,
-    pub target_version: SelectorVersion,
-    pub reason: ForceReason,
+    pub component_name: ComponentName,
+    pub current: SelectorVersion,
+    pub target: SelectorVersion,
+    pub force_reason: ForceReason,
 }
 
 #[rustfmt::skip]
@@ -297,10 +297,10 @@ pub struct ForceFlip {
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct Rollback {
-    pub component: ComponentName,
-    pub active_version: SelectorVersion,
-    pub restore_version: SelectorVersion,
-    pub reason: RollbackReason,
+    pub component_name: ComponentName,
+    pub active: SelectorVersion,
+    pub restore: SelectorVersion,
+    pub rollback_reason: RollbackReason,
 }
 
 #[rustfmt::skip]
@@ -310,9 +310,9 @@ pub struct Rollback {
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct Quarantine {
-    pub component: ComponentName,
-    pub version: SelectorVersion,
-    pub reason: QuarantineReason,
+    pub component_name: ComponentName,
+    pub selector_version: SelectorVersion,
+    pub quarantine_reason: QuarantineReason,
 }
 
 #[rustfmt::skip]
@@ -322,8 +322,8 @@ pub struct Quarantine {
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct ForcedFlip {
-    pub component: ComponentName,
-    pub active_version: SelectorVersion,
+    pub component_name: ComponentName,
+    pub selector_version: SelectorVersion,
 }
 
 #[rustfmt::skip]
@@ -333,8 +333,8 @@ pub struct ForcedFlip {
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct RolledBack {
-    pub component: ComponentName,
-    pub active_version: SelectorVersion,
+    pub component_name: ComponentName,
+    pub selector_version: SelectorVersion,
 }
 
 #[rustfmt::skip]
@@ -344,8 +344,8 @@ pub struct RolledBack {
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct Quarantined {
-    pub component: ComponentName,
-    pub version: SelectorVersion,
+    pub component_name: ComponentName,
+    pub selector_version: SelectorVersion,
 }
 
 #[rustfmt::skip]
@@ -381,8 +381,8 @@ pub enum SelectorRejectionReason {
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct Rejected {
-    pub component: ComponentName,
-    pub reason: SelectorRejectionReason,
+    pub component_name: ComponentName,
+    pub selector_rejection_reason: SelectorRejectionReason,
 }
 
 #[rustfmt::skip]
