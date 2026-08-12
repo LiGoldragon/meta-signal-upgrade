@@ -25,4 +25,4 @@ driver, or systemd integration.
   contract's `AttemptUpgrade` is the upgrade request verb.
 - `RequestUnimplemented` stays available so partial implementations can
   return typed skeleton replies.
-- Round-trip tests cover both NOTA and Signal-frame encoding.
+- Round-trip tests cover both DOTOS and Signal-frame encoding.

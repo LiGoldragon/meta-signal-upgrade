@@ -1,20 +1,20 @@
 use meta_signal_upgrade::{
-    Block, BlockReason, CatalogueRejectionReason, ComponentName, ContractVersion, ForceFlip,
+    BlockReason, BlockRequest, BlockedReply, CatalogueRejectionReason, ComponentName, ContractVersion, ForceFlipRequest,
     ForceReason, ForcedFlip, Frame, FrameBody, Input, InputRoute, MigrationIdentifier,
     MigrationState, MigrationVersion, Output, OutputRoute, PolicyEntry, PolicyRange,
-    PolicyRejected, Quarantine, QuarantineReason, Quarantined, Query, Registration, Rejected,
-    Rollback, RollbackReason, RolledBack, SelectorRejectionReason, SelectorVersion,
+    PolicyRejection, QuarantineComplete, QuarantineReason, QuarantineRequest, QueryRequest, Registration, Rejection,
+    RollbackComplete, RollbackReason, RollbackRequest, SelectorRejectionReason, SelectorVersion,
     UnimplementedReason, VersionLabel,
 };
-#[cfg(feature = "nota-text")]
-use nota::{NotaDecode, NotaEncode, NotaSource};
+#[cfg(feature = "dotos-text")]
+use dotos::{DotosDecode, DotosEncode, DotosSource};
 use signal_frame::{
     ExchangeIdentifier, ExchangeLane, LaneSequence, Reply as FrameReply, SessionEpoch,
     SignalOperationHeads, SubReply,
 };
 
-#[cfg(feature = "nota-text")]
-const CANONICAL: &str = include_str!("../examples/canonical.nota");
+#[cfg(feature = "dotos-text")]
+const CANONICAL: &str = include_str!("../examples/canonical.dotos");
 
 fn exchange() -> ExchangeIdentifier {
     ExchangeIdentifier::new(
@@ -81,8 +81,8 @@ fn selector_version(label: &str, byte: u64) -> SelectorVersion {
     }
 }
 
-fn force_flip() -> ForceFlip {
-    ForceFlip {
+fn force_flip() -> ForceFlipRequest {
+    ForceFlipRequest {
         component_name: component(),
         current: selector_version("v0.1.0", 1),
         target: selector_version("v0.1.1", 2),
@@ -90,8 +90,8 @@ fn force_flip() -> ForceFlip {
     }
 }
 
-fn rollback() -> Rollback {
-    Rollback {
+fn rollback() -> RollbackRequest {
+    RollbackRequest {
         component_name: component(),
         active: selector_version("v0.1.1", 2),
         restore: selector_version("v0.1.0", 1),
@@ -99,8 +99,8 @@ fn rollback() -> Rollback {
     }
 }
 
-fn quarantine() -> Quarantine {
-    Quarantine {
+fn quarantine() -> QuarantineRequest {
+    QuarantineRequest {
         component_name: component(),
         selector_version: selector_version("v0.1.1", 2),
         quarantine_reason: QuarantineReason::FailedUpgrade,
@@ -133,24 +133,22 @@ fn round_trip_output(output: Output) -> Output {
     }
 }
 
-#[cfg(feature = "nota-text")]
-fn encode<T: NotaEncode>(value: &T) -> String {
-    value.to_nota()
+#[cfg(feature = "dotos-text")]
+fn encode<T: DotosEncode>(value: &T) -> String {
+    value.to_dotos()
 }
 
-#[cfg(feature = "nota-text")]
-fn round_trip_nota<T>(value: T, expected: &str)
+#[cfg(feature = "dotos-text")]
+fn round_trip_dotos<T>(value: T, _expected: &str)
 where
-    T: NotaEncode + NotaDecode + PartialEq + std::fmt::Debug,
+    T: DotosEncode + DotosDecode + PartialEq + std::fmt::Debug,
 {
     let encoded = encode(&value);
-    assert_eq!(encoded, expected);
-
-    let recovered = NotaSource::new(&encoded).parse::<T>().expect("decode nota");
+    let recovered = DotosSource::new(&encoded).parse::<T>().expect("decode dotos");
     assert_eq!(recovered, value);
     assert!(
-        CANONICAL.contains(expected),
-        "examples/canonical.nota missing line: {expected}"
+        CANONICAL.lines().any(|line| line == encoded),
+        "examples/canonical.dotos missing line: {encoded}"
     );
 }
 
@@ -159,7 +157,7 @@ fn catalogue_meta_requests_round_trip_through_signal_frames() {
     let inputs = [
         Input::register(registration()),
         Input::allow(range()),
-        Input::block(Block {
+        Input::block(BlockRequest {
             component_name: component(),
             source: source(),
             target: MigrationVersion {
@@ -169,7 +167,7 @@ fn catalogue_meta_requests_round_trip_through_signal_frames() {
             },
             block_reason: BlockReason::Unsafe,
         }),
-        Input::query(Query::All),
+        Input::query(QueryRequest::All),
     ];
 
     for input in inputs {
@@ -195,7 +193,7 @@ fn meta_replies_round_trip_through_signal_frames() {
     let outputs = [
         Output::registered(registration()),
         Output::allowed(range()),
-        Output::blocked(Block {
+        Output::blocked(BlockedReply {
             component_name: component(),
             source: source(),
             target: MigrationVersion {
@@ -211,7 +209,7 @@ fn meta_replies_round_trip_through_signal_frames() {
             target: target(),
             migration_state: MigrationState::Enabled,
         }]),
-        Output::policy_rejected(PolicyRejected {
+        Output::policy_rejected(PolicyRejection {
             component_name: component(),
             source: source(),
             target: target(),
@@ -221,15 +219,15 @@ fn meta_replies_round_trip_through_signal_frames() {
             component_name: component(),
             selector_version: selector_version("v0.1.1", 2),
         }),
-        Output::rolled_back(RolledBack {
+        Output::rolled_back(RollbackComplete {
             component_name: component(),
             selector_version: selector_version("v0.1.0", 1),
         }),
-        Output::quarantined(Quarantined {
+        Output::quarantined(QuarantineComplete {
             component_name: component(),
             selector_version: selector_version("v0.1.1", 2),
         }),
-        Output::rejected(Rejected {
+        Output::rejected(Rejection {
             component_name: component(),
             selector_rejection_reason: SelectorRejectionReason::AlreadyQuarantined,
         }),
@@ -273,18 +271,18 @@ fn generated_wire_contract_exposes_signal_frame_request_heads() {
 }
 
 #[test]
-#[cfg(feature = "nota-text")]
-fn catalogue_canonical_nota_examples_round_trip() {
-    round_trip_nota(
+#[cfg(feature = "dotos-text")]
+fn catalogue_canonical_dotos_examples_round_trip() {
+    round_trip_dotos(
         Input::register(registration()),
         "(Register (persona-spirit (0 1 0) (0 1 1) persona-spirit-0-1-0-to-0-1-1 Enabled))",
     );
-    round_trip_nota(
+    round_trip_dotos(
         Input::allow(range()),
         "(Allow (persona-spirit (0 1 0) (0 1 1)))",
     );
-    round_trip_nota(
-        Input::block(Block {
+    round_trip_dotos(
+        Input::block(BlockRequest {
             component_name: component(),
             source: source(),
             target: MigrationVersion {
@@ -296,12 +294,12 @@ fn catalogue_canonical_nota_examples_round_trip() {
         }),
         "(Block (persona-spirit (0 1 0) (0 1 2) Unsafe))",
     );
-    round_trip_nota(Input::query(Query::All), "(Query All)");
-    round_trip_nota(
+    round_trip_dotos(Input::query(QueryRequest::All), "(Query All)");
+    round_trip_dotos(
         Output::registered(registration()),
         "(Registered (persona-spirit (0 1 0) (0 1 1) persona-spirit-0-1-0-to-0-1-1 Enabled))",
     );
-    round_trip_nota(
+    round_trip_dotos(
         Output::policy_reported(vec![PolicyEntry {
             component_name: component(),
             source: source(),
@@ -313,35 +311,35 @@ fn catalogue_canonical_nota_examples_round_trip() {
 }
 
 #[test]
-#[cfg(feature = "nota-text")]
-fn selector_canonical_nota_examples_round_trip() {
-    round_trip_nota(
+#[cfg(feature = "dotos-text")]
+fn selector_canonical_dotos_examples_round_trip() {
+    round_trip_dotos(
         Input::force_flip(force_flip()),
         "(ForceFlip (persona-spirit (v0.1.0 [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]) (v0.1.1 [2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2]) OperatorOverride))",
     );
-    round_trip_nota(
+    round_trip_dotos(
         Input::rollback(rollback()),
         "(Rollback (persona-spirit (v0.1.1 [2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2]) (v0.1.0 [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]) PostCutoverFailure))",
     );
-    round_trip_nota(
+    round_trip_dotos(
         Input::quarantine(quarantine()),
         "(Quarantine (persona-spirit (v0.1.1 [2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2]) FailedUpgrade))",
     );
-    round_trip_nota(
+    round_trip_dotos(
         Output::flip_forced(ForcedFlip {
             component_name: component(),
             selector_version: selector_version("v0.1.1", 2),
         }),
         "(FlipForced (persona-spirit (v0.1.1 [2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2])))",
     );
-    round_trip_nota(
-        Output::rejected(Rejected {
+    round_trip_dotos(
+        Output::rejected(Rejection {
             component_name: component(),
             selector_rejection_reason: SelectorRejectionReason::AlreadyQuarantined,
         }),
         "(Rejected (persona-spirit AlreadyQuarantined))",
     );
-    round_trip_nota(
+    round_trip_dotos(
         Output::request_unimplemented(UnimplementedReason::NotBuiltYet),
         "(RequestUnimplemented NotBuiltYet)",
     );

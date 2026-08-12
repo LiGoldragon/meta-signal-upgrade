@@ -11,7 +11,7 @@ communication dependencies.
 
 ## Boundaries
 
-This crate owns only typed meta-signal records, optional NOTA projection
+This crate owns only typed meta-signal records, optional DOTOS projection
 derives, generated `signal-frame` aliases/codecs, and round-trip
 witnesses. It does not own runtime policy storage, catalogue mutation,
 selector state, migration execution, socket binding, or Persona unit
@@ -44,15 +44,15 @@ role is merged here rather than preserved as a separate meta-signal repo.
 - `src/lib.rs` re-exports the generated schema module as the crate's
   public contract API.
 - `tests/round_trip.rs` proves the merged meta channel round-trips through
-  Signal frames in default mode and through NOTA under `nota-text`.
+  Signal frames in default mode and through DOTOS under `dotos-text`.
 - `tests/dependency_boundary.rs` pins the feature boundary: default builds
-  do not pull `nota`, `nota-codec`, or `signal-core`; `nota-text` is the
+  do not pull `dotos`, `dotos-codec`, or `signal-core`; `dotos-text` is the
   explicit text-codec opt-in.
 - `tests/generated_schema.rs` exercises generated Input/Output
   short-header/frame round-trips and guards against generated
   Nexus/SEMA runtime terms, trace/mail helpers, and generic plane
   envelopes in this contract.
-- `examples/canonical.nota` records stable meta-signal text examples.
+- `examples/canonical.dotos` records stable meta-signal text examples.
 
 ## Invariants
 
@@ -62,7 +62,7 @@ role is merged here rather than preserved as a separate meta-signal repo.
   runtime code.
 - The generated schema module is emitted with `schema-rust` in wire-contract
   mode, so it carries wire types/codecs only.
-- NOTA parsing/rendering is feature-gated under `nota-text`; the default
+- DOTOS parsing/rendering is feature-gated under `dotos-text`; the default
   contract graph is binary-only for daemon consumers.
 - The meta-signal and ordinary contracts remain separate repositories.
 - Catalogue policy records use contract-local `ComponentName`,

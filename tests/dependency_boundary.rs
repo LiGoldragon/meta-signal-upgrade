@@ -9,7 +9,7 @@ fn default_dependency_tree_is_binary_only() {
 
     assert!(output.status.success(), "status: {:?}", output.status);
     let tree = String::from_utf8(output.stdout).expect("cargo tree output");
-    for forbidden in ["nota v", "nota-codec", "signal-core"] {
+    for forbidden in ["dotos v", "dotos-codec", "signal-core"] {
         assert!(
             !tree.contains(forbidden),
             "default dependency tree unexpectedly contains {forbidden}:\n{tree}"
@@ -18,7 +18,7 @@ fn default_dependency_tree_is_binary_only() {
 }
 
 #[test]
-fn nota_text_feature_is_the_text_codec_boundary() {
+fn dotos_text_feature_is_the_text_codec_boundary() {
     let output = Command::new(env!("CARGO"))
         .args([
             "tree",
@@ -26,7 +26,7 @@ fn nota_text_feature_is_the_text_codec_boundary() {
             "normal",
             "--no-default-features",
             "--features",
-            "nota-text",
+            "dotos-text",
         ])
         .output()
         .expect("run cargo tree");
@@ -34,7 +34,7 @@ fn nota_text_feature_is_the_text_codec_boundary() {
     assert!(output.status.success(), "status: {:?}", output.status);
     let tree = String::from_utf8(output.stdout).expect("cargo tree output");
     assert!(
-        tree.contains("nota v"),
-        "nota-text feature should pull nota:\n{tree}"
+        tree.contains("dotos v"),
+        "dotos-text feature should pull dotos:\n{tree}"
     );
 }

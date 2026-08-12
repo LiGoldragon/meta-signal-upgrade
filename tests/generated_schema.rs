@@ -1,8 +1,9 @@
 use meta_signal_upgrade::schema::lib::{
-    Block, BlockReason, ComponentName, ForceFlip, ForceReason, Input, InputRoute, Output,
+    BlockedReply, BlockReason, ComponentName, ForceFlipRequest, ForceReason, Frame, FrameBody, Input, InputRoute, Output,
     OutputRoute, PolicyRange, VersionLabel,
 };
 use meta_signal_upgrade::schema::lib::{ContractVersion, SelectorVersion};
+use signal_frame::{ExchangeIdentifier, ExchangeLane, LaneSequence, Reply, SessionEpoch, SubReply};
 
 const SCHEMA_SOURCE: &str = include_str!("../schema/lib.schema");
 const GENERATED_SCHEMA_RUST: &str = include_str!("../src/schema/lib.rs");
@@ -38,8 +39,16 @@ fn range() -> PolicyRange {
     }
 }
 
-fn force_flip() -> ForceFlip {
-    ForceFlip {
+fn exchange() -> ExchangeIdentifier {
+    ExchangeIdentifier::new(
+        SessionEpoch::new(1),
+        ExchangeLane::Connector,
+        LaneSequence::first(),
+    )
+}
+
+fn force_flip() -> ForceFlipRequest {
+    ForceFlipRequest {
         component_name: ComponentName::new("persona-spirit"),
         current: selector_version("v0.1.0", 1),
         target: selector_version("v0.1.1", 2),
@@ -53,16 +62,19 @@ fn generated_meta_input_owns_short_header_and_frame() {
 
     assert_eq!(input.route(), InputRoute::ForceFlip);
 
-    let frame = input.encode_signal_frame().expect("encode generated input");
-    let (route, decoded) = Input::decode_signal_frame(&frame).expect("decode generated input");
+    let frame = input.clone().into_frame(exchange());
+    let bytes = frame.encode_length_prefixed().expect("encode generated input");
+    let decoded = Frame::decode_length_prefixed(&bytes).expect("decode generated input");
 
-    assert_eq!(route, InputRoute::ForceFlip);
-    assert_eq!(decoded, input);
+    match decoded.into_body() {
+        FrameBody::Request { request, .. } => assert_eq!(request.payloads().head(), &input),
+        other => panic!("expected request, got {other:?}"),
+    }
 }
 
 #[test]
 fn generated_meta_output_owns_short_header_and_frame() {
-    let output = Output::blocked(Block {
+    let output = Output::blocked(BlockedReply {
         component_name: ComponentName::new("persona-spirit"),
         source: range().source,
         target: range().target,
@@ -71,15 +83,16 @@ fn generated_meta_output_owns_short_header_and_frame() {
 
     assert_eq!(output.route(), OutputRoute::Blocked);
 
-    let frame = output
-        .encode_signal_frame()
-        .expect("encode generated output");
-    let (route, decoded) = Output::decode_signal_frame(&frame).expect("decode generated output");
+    let frame = output.clone().into_reply_frame(exchange());
+    let bytes = frame.encode_length_prefixed().expect("encode generated output");
+    let decoded = Frame::decode_length_prefixed(&bytes).expect("decode generated output");
 
-    assert_eq!(route, OutputRoute::Blocked);
-    match decoded {
-        Output::Blocked(block) => assert_eq!(block.block_reason, BlockReason::Unsafe),
-        other => panic!("expected Blocked output, got {other:?}"),
+    match decoded.into_body() {
+        FrameBody::Reply { reply: Reply::Accepted { per_operation, .. }, .. } => match per_operation.into_head() {
+            SubReply::Ok(Output::Blocked(block)) => assert_eq!(block.block_reason, BlockReason::Unsafe),
+            other => panic!("expected Blocked output, got {other:?}"),
+        },
+        other => panic!("expected reply, got {other:?}"),
     }
 }
 
