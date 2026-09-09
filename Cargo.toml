@@ -15,11 +15,11 @@ name = "meta_signal_upgrade"
 path = "src/lib.rs"
 
 [features]
-default = ["datom"]
+default = []
 datom = ["dep:datom-codec"]
 
 [dependencies]
-datom-codec = { git = "https://github.com/LiGoldragon/datom-codec.git", rev = "f0aeeaa8ea8bdbbd0b9d7b96a35e9e3b3e4a9452", optional = true }
+datom-codec = { git = "https://github.com/LiGoldragon/datom-codec.git", rev = "cd0255d774847826d53d063ab856ebe0dd09e250", optional = true }
 rkyv         = { version = "0.8", default-features = false, features = ["std", "bytecheck", "little_endian", "pointer_width_32", "unaligned"] }
 signal-frame = { git = "https://github.com/LiGoldragon/signal-frame.git", rev = "ca72b2d1151f", default-features = false }
 thiserror         = "2"
