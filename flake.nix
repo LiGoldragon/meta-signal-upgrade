@@ -24,13 +24,12 @@
         ];
         craneLib = (crane.mkLib pkgs).overrideToolchain toolchain;
         examplesFilter = path: _type: builtins.match ".*/examples(/.*)?$" path != null;
-        schemaFilter = path: type:
-          type == "regular"
-            && (pkgs.lib.hasSuffix ".schema" path);
+        ethosFilter = path: type:
+          type == "regular" && pkgs.lib.hasSuffix ".ethos" path;
         sourceFilter = path: type:
           (craneLib.filterCargoSources path type)
             || (examplesFilter path type)
-            || (schemaFilter path type);
+            || (ethosFilter path type);
         src = pkgs.lib.cleanSourceWith {
           src = ./.;
           filter = sourceFilter;
@@ -48,20 +47,7 @@
         checks = {
           build = craneLib.cargoBuild (commonArguments // { inherit cargoArtifacts; });
           test = craneLib.cargoTest (commonArguments // { inherit cargoArtifacts; });
-          test-round-trip = craneLib.cargoTest (commonArguments // {
-            inherit cargoArtifacts;
-            cargoTestExtraArgs = "--test round_trip";
-          });
-          test-generated-schema = craneLib.cargoTest (commonArguments // {
-            inherit cargoArtifacts;
-            cargoTestExtraArgs = "--test generated_schema";
-          });
-          generated-schema-source-checked-in = pkgs.runCommand "meta-signal-upgrade-generated-schema-source-checked-in" { } ''
-            test -f ${src}/schema/lib.schema
-            test -f ${src}/src/schema/lib.rs
-            ! grep -R "include!(concat!(env!(\"OUT_DIR\")" ${src}/src ${src}/build.rs
-            touch $out
-          '';
+          test-datom = craneLib.cargoTest (commonArguments // { inherit cargoArtifacts; cargoTestExtraArgs = "--features datom"; });
           doc = craneLib.cargoDoc (commonArguments // {
             inherit cargoArtifacts;
             RUSTDOCFLAGS = "-D warnings";
@@ -69,7 +55,7 @@
           fmt = craneLib.cargoFmt { inherit src; };
           clippy = craneLib.cargoClippy (commonArguments // {
             inherit cargoArtifacts;
-            cargoClippyExtraArgs = "--all-targets -- -D warnings";
+            cargoClippyExtraArgs = "--all-targets --all-features -- -D warnings";
           });
         };
         devShells.default = pkgs.mkShell {
