@@ -52,7 +52,7 @@ role is merged here rather than preserved as a separate meta-signal repo.
   short-header/frame round-trips and guards against generated
   Nexus/SEMA runtime terms, trace/mail helpers, and generic plane
   envelopes in this contract.
-- `examples/canonical.dotos` records stable meta-signal text examples.
+- `examples/canonical.datom` records stable meta-signal text examples.
 
 ## Invariants
 
