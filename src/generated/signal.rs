@@ -1,7 +1,11 @@
 #![allow(dead_code, non_camel_case_types, non_snake_case)]
+#[rustfmt::skip]
 pub type ComponentName = String;
+#[rustfmt::skip]
 pub type MigrationIdentifier = String;
+#[rustfmt::skip]
 pub type ContractVersion = std::vec::Vec<i64>;
+#[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(
     feature = "datom",
@@ -12,6 +16,7 @@ pub struct MigrationVersion {
     pub second_integer: i64,
     pub third_integer: i64,
 }
+#[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(
     feature = "datom",
@@ -21,6 +26,7 @@ pub enum MigrationState {
     Enabled,
     Disabled,
 }
+#[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(
     feature = "datom",
@@ -33,6 +39,7 @@ pub struct Registration {
     pub migration_identifier: MigrationIdentifier,
     pub migration_state: MigrationState,
 }
+#[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(
     feature = "datom",
@@ -43,6 +50,7 @@ pub struct PolicyRange {
     pub first_migration_version: MigrationVersion,
     pub second_migration_version: MigrationVersion,
 }
+#[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(
     feature = "datom",
@@ -53,6 +61,7 @@ pub enum BlockReason {
     Superseded,
     NotReviewed,
 }
+#[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(
     feature = "datom",
@@ -64,6 +73,7 @@ pub struct BlockRequest {
     pub second_migration_version: MigrationVersion,
     pub block_reason: BlockReason,
 }
+#[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(
     feature = "datom",
@@ -73,6 +83,7 @@ pub enum QueryRequest {
     All,
     Component(ComponentName),
 }
+#[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(
     feature = "datom",
@@ -84,6 +95,7 @@ pub struct PolicyEntry {
     pub second_migration_version: MigrationVersion,
     pub migration_state: MigrationState,
 }
+#[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(
     feature = "datom",
@@ -95,7 +107,9 @@ pub struct BlockedReply {
     pub second_migration_version: MigrationVersion,
     pub block_reason: BlockReason,
 }
+#[rustfmt::skip]
 pub type PolicyReport = std::vec::Vec<PolicyEntry>;
+#[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(
     feature = "datom",
@@ -106,6 +120,7 @@ pub enum CatalogueRejectionReason {
     AlreadyRegistered,
     NotAllowed,
 }
+#[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(
     feature = "datom",
@@ -117,7 +132,9 @@ pub struct PolicyRejection {
     pub second_migration_version: MigrationVersion,
     pub catalogue_rejection_reason: CatalogueRejectionReason,
 }
+#[rustfmt::skip]
 pub type VersionLabel = String;
+#[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(
     feature = "datom",
@@ -127,6 +144,7 @@ pub struct SelectorVersion {
     pub version_label: VersionLabel,
     pub contract_version: ContractVersion,
 }
+#[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(
     feature = "datom",
@@ -137,6 +155,7 @@ pub enum ForceReason {
     MarkerMismatchAccepted,
     EmergencyRecovery,
 }
+#[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(
     feature = "datom",
@@ -147,6 +166,7 @@ pub enum RollbackReason {
     OperatorOverride,
     RecoveryDrill,
 }
+#[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(
     feature = "datom",
@@ -157,6 +177,7 @@ pub enum QuarantineReason {
     SuspectState,
     OperatorHold,
 }
+#[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(
     feature = "datom",
@@ -168,6 +189,7 @@ pub struct ForceFlipRequest {
     pub second_selector_version: SelectorVersion,
     pub force_reason: ForceReason,
 }
+#[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(
     feature = "datom",
@@ -179,6 +201,7 @@ pub struct RollbackRequest {
     pub second_selector_version: SelectorVersion,
     pub rollback_reason: RollbackReason,
 }
+#[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(
     feature = "datom",
@@ -189,6 +212,7 @@ pub struct QuarantineRequest {
     pub selector_version: SelectorVersion,
     pub quarantine_reason: QuarantineReason,
 }
+#[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(
     feature = "datom",
@@ -198,6 +222,7 @@ pub struct ForcedFlip {
     pub component_name: ComponentName,
     pub selector_version: SelectorVersion,
 }
+#[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(
     feature = "datom",
@@ -207,6 +232,7 @@ pub struct RollbackComplete {
     pub component_name: ComponentName,
     pub selector_version: SelectorVersion,
 }
+#[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(
     feature = "datom",
@@ -216,6 +242,7 @@ pub struct QuarantineComplete {
     pub component_name: ComponentName,
     pub selector_version: SelectorVersion,
 }
+#[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(
     feature = "datom",
@@ -231,6 +258,7 @@ pub enum SelectorRejectionReason {
     HandoverRejected,
     UpgradeSocketUnavailable,
 }
+#[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(
     feature = "datom",
@@ -240,6 +268,7 @@ pub struct Rejection {
     pub component_name: ComponentName,
     pub selector_rejection_reason: SelectorRejectionReason,
 }
+#[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(
     feature = "datom",
@@ -249,7 +278,9 @@ pub enum UnimplementedReason {
     NotBuiltYet,
     IntegrationNotLanded,
 }
+#[rustfmt::skip]
 pub type UnimplementedRequest = UnimplementedReason;
+#[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(
     feature = "datom",
@@ -264,6 +295,7 @@ pub enum Query {
     Rollback(RollbackRequest),
     Quarantine(QuarantineRequest),
 }
+#[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(
     feature = "datom",
