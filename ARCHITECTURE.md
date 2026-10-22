@@ -15,7 +15,7 @@ This crate owns only typed meta-signal records, optional DOTOS projection
 derives, generated `signal-frame` aliases/codecs, and round-trip
 witnesses. It does not own runtime policy storage, catalogue mutation,
 selector state, migration execution, socket binding, or Persona unit
-control. Daemon-internal Signal/Nexus/SEMA plane schemas live inside the
+control. Daemon-internal Signal/Nexus/MEMORY plane schemas live inside the
 `upgrade` runtime crate, not in this external contract repository.
 
 ## Working Shape
@@ -30,7 +30,7 @@ so peers call `AttemptUpgrade` on the ordinary `signal-upgrade` contract.
 meta authority configures the policy that permits or blocks those attempts
 and keeps emergency selector controls available.
 
-The old `owner-signal-sema-upgrade` prototype is archived. Its catalogue-policy
+The old `owner-signal-memory-upgrade` prototype is archived. Its catalogue-policy
 role is merged here rather than preserved as a separate meta-signal repo.
 
 ## Code Map
@@ -50,7 +50,7 @@ role is merged here rather than preserved as a separate meta-signal repo.
   explicit text-codec opt-in.
 - `tests/generated_schema.rs` exercises generated Input/Output
   short-header/frame round-trips and guards against generated
-  Nexus/SEMA runtime terms, trace/mail helpers, and generic plane
+  Nexus/MEMORY runtime terms, trace/mail helpers, and generic plane
   envelopes in this contract.
 - `examples/canonical.datom` records stable meta-signal text examples.
 
