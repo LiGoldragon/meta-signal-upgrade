@@ -1,10 +1,21 @@
-#![allow(dead_code, non_camel_case_types, non_snake_case)]
+#![allow(
+    dead_code,
+    non_camel_case_types,
+    non_snake_case,
+    clippy::type_complexity
+)]
 #[rustfmt::skip]
-pub type ComponentName = String;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub struct ComponentName(pub String);
 #[rustfmt::skip]
-pub type MigrationIdentifier = String;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub struct MigrationIdentifier(pub String);
 #[rustfmt::skip]
-pub type ContractVersion = std::vec::Vec<i64>;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub struct ContractVersion(pub std::vec::Vec<i64>);
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
@@ -81,7 +92,9 @@ pub struct BlockedReply {
     pub block_reason: BlockReason,
 }
 #[rustfmt::skip]
-pub type PolicyReport = std::vec::Vec<PolicyEntry>;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub struct PolicyReport(pub std::vec::Vec<PolicyEntry>);
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
@@ -100,7 +113,9 @@ pub struct PolicyRejection {
     pub catalogue_rejection_reason: CatalogueRejectionReason,
 }
 #[rustfmt::skip]
-pub type VersionLabel = String;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub struct VersionLabel(pub String);
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
@@ -207,7 +222,9 @@ pub enum UnimplementedReason {
     IntegrationNotLanded,
 }
 #[rustfmt::skip]
-pub type UnimplementedRequest = UnimplementedReason;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub struct UnimplementedRequest(pub UnimplementedReason);
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]

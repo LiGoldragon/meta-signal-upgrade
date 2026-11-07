@@ -1,6 +1,6 @@
 use meta_signal_upgrade::{
     ByteViewable, Query, QueryRequest, Response, Restorable, Signal, Signalizable,
-    UnimplementedReason,
+    UnimplementedReason, UnimplementedRequest,
 };
 #[test]
 fn query_round_trips_as_fresh_signal() {
@@ -10,7 +10,7 @@ fn query_round_trips_as_fresh_signal() {
 }
 #[test]
 fn rejection_round_trips_as_fresh_signal() {
-    let v = Response::RequestUnimplemented(UnimplementedReason::NotBuiltYet);
+    let v = Response::RequestUnimplemented(UnimplementedRequest(UnimplementedReason::NotBuiltYet));
     let r = Signal::<Response>::from(v.signalize().expect("signalize").bytes().to_vec());
     assert_eq!(r.restore().expect("restore"), v);
 }
@@ -25,7 +25,7 @@ fn query_round_trips_as_datom_text() {
     assert_eq!(
         p.actualize(&mut Budget {
             remaining: 1024,
-            reader: ReaderBudget { remaining: 1024 },
+            reader: ReaderBudget::try_from(1024).unwrap(),
             depth: 0,
             maximum_depth: 1024
         })
